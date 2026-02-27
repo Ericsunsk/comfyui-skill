@@ -1,0 +1,149 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.comfy.org/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# ComfyUI Flux.2 Klein 4B 指南
+
+> 快速了解 FLUX.2 [klein] 4B，并在 ComfyUI 中运行文生图与图像编辑工作流。
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Y9foxm9OYEU?si=FeueXTTBoIkydjk7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen />
+
+## 关于 FLUX.2 \[Klein]
+
+FLUX.2 \[Klein] 是 Flux 系列中目前(2026年1月15日)最快的模型，将文生图与图像编辑统一在紧凑架构中。它面向交互式工作流、即时预览与低延迟场景；蒸馏版本可在约 1 秒内完成端到端推理，并在单图与多图参考编辑中保持出色画质。
+
+**模型亮点：**
+
+* 两种 4B 版本：Base（未蒸馏）适合最大灵活性与微调；Distilled（4 步）用于速度优先的部署
+* 性能：蒸馏版约 \~1.2s（5090）· 8.4GB 显存；Base 约 \~17s（5090）· 9.2GB 显存
+* 编辑能力：风格转换、语义编辑、物体替换/移除、多参考合成、迭代式编辑
+
+<Tip>
+  <Tabs>
+    <Tab title="便携版或手动安装用户">
+      请确保你的 ComfyUI 已经更新。
+
+      * [ComfyUI 下载](https://www.comfy.org/download)
+      * [ComfyUI 更新教程](/zh-CN/installation/update_comfyui)
+
+      本指南里的工作流可以在 ComfyUI 的[工作流模板](/zh-CN/interface/features/template)中找到。如果找不到，可能是 ComfyUI 没有更新。
+
+      如果加载工作流时有节点缺失，可能原因有：
+
+      1. 你用的不是最新开发版（nightly）。
+      2. 你用的是稳定版或桌面版（没有包含最新的更新）。
+      3. 启动时有些节点导入失败。
+    </Tab>
+
+    <Tab title="桌面版或云端用户">
+      * 桌面版是基于 ComfyUI 稳定版本构建的，它会在有新的桌面稳定版本发布时自动更新。
+      * [Cloud](https://cloud.comfy.org) 会在 ComfyUI 稳定版本发布后更新，我们会同步更新 Cloud。
+
+      所以，如果你发现本教程中有任何核心节点缺失，那是因为对应的节点支持还在开发中没有发布正式的稳定版，请等待下一个稳定版本发布。
+    </Tab>
+  </Tabs>
+</Tip>
+
+## Flux.2 Klein 4B 工作流
+
+<CardGroup cols={3}>
+  <Card title="4B 文生图工作流" icon="download" href="https://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_flux2_klein_text_to_image.json">
+    下载 Flux.2 Klein 4B 文生图工作流。
+  </Card>
+
+  <Card title="4B 图像编辑 Base" icon="download" href="https://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_flux2_klein_image_edit_4b_base.json">
+    下载 4B Base 模型图像编辑工作流。
+  </Card>
+
+  <Card title="4B 图像编辑 Distilled" icon="download" href="https://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_flux2_klein_image_edit_4b_distilled.json">
+    下载 4B 蒸馏版快速图像编辑工作流。
+  </Card>
+</CardGroup>
+
+## Flux.2 Klein 4B 模型下载
+
+<CardGroup cols={2}>
+  <Card title="qwen_3_4b.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/flux2-klein-4B/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors">
+    4B 模型文本编码器。
+  </Card>
+
+  <Card title="flux-2-klein-base-4b-fp8.safetensors" icon="download" href="https://huggingface.co/black-forest-labs/FLUX.2-klein-base-4b-fp8/resolve/main/flux-2-klein-base-4b-fp8.safetensors">
+    扩散模型（4B Base）。
+  </Card>
+
+  <Card title="flux-2-klein-4b-fp8.safetensors" icon="download" href="https://huggingface.co/black-forest-labs/FLUX.2-klein-4b-fp8/resolve/main/flux-2-klein-4b-fp8.safetensors">
+    扩散模型（4B 蒸馏版）。
+  </Card>
+
+  <Card title="flux2-vae.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/vae/flux2-vae.safetensors">
+    4B 模型 VAE。
+  </Card>
+</CardGroup>
+
+**4B 模型存放路径**
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 text_encoders/
+│   │      └── qwen_3_4b.safetensors
+│   ├── 📂 diffusion_models/
+│   │      ├── flux-2-klein-base-4b-fp8.safetensors
+│   │      └── flux-2-klein-4b-fp8.safetensors
+│   └── 📂 vae/
+│          └── flux2-vae.safetensors
+```
+
+## Flux.2 Klein 9B 工作流
+
+<CardGroup cols={3}>
+  <Card title="9B 文生图工作流" icon="download" href="http://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_flux2_text_to_image_9b.json">
+    下载 Flux.2 Klein 9B 文生图工作流。
+  </Card>
+
+  <Card title="9B 图像编辑 Base" icon="download" href="http://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_flux2_klein_image_edit_9b_base.json">
+    下载 9B Base 模型图像编辑工作流。
+  </Card>
+
+  <Card title="9B 图像编辑 Distilled" icon="download" href="http://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_flux2_klein_image_edit_9b_distilled.json">
+    下载 9B 蒸馏版快速图像编辑工作流。
+  </Card>
+</CardGroup>
+
+## Flux.2 Klein 9B 模型下载
+
+<Note>
+  扩散模型需要访问 BFL 仓库，接受协议后才能下载。
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="flux-2-klein-base-9b-fp8.safetensors" icon="download" href="https://huggingface.co/black-forest-labs/FLUX.2-klein-base-9b-fp8">
+    扩散模型（9B Base）。
+  </Card>
+
+  <Card title="flux-2-klein-9b-fp8.safetensors" icon="download" href="https://huggingface.co/black-forest-labs/FLUX.2-klein-9b-fp8">
+    扩散模型（9B 蒸馏版）。
+  </Card>
+
+  <Card title="qwen_3_8b_fp8mixed.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/flux2-klein-9B/resolve/main/split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors">
+    9B 模型文本编码器。
+  </Card>
+
+  <Card title="flux2-vae.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/split_files/vae/flux2-vae.safetensors">
+    9B 模型 VAE。
+  </Card>
+</CardGroup>
+
+**9B 模型存放路径**
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 diffusion_models/
+│   │      ├── flux-2-klein-9b-fp8.safetensors
+│   │      └── flux-2-klein-base-9b-fp8.safetensors
+│   ├── 📂 text_encoders/
+│   │      └── qwen_3_8b_fp8mixed.safetensors
+│   └── 📂 vae/
+│          └── flux2-vae.safetensors
+```

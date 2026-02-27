@@ -1,0 +1,129 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.comfy.org/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Z-Image-Turbo ComfyUI Workflow Example
+
+> Z-Image-Turbo is a distilled 6B parameter efficient image generation model with sub-second inference latency.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/HvaEsnyOfSw?si=bsOQzcL0vsPcaE83" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen />
+
+**Z-Image (造相)** is a powerful and highly efficient image generation model with **6B** parameters, developed by Alibaba's Tongyi Lab. It uses a **Scalable Single-Stream DiT** (S3-DiT) architecture where text, visual semantic tokens, and image VAE tokens are concatenated at the sequence level to serve as a unified input stream, maximizing parameter efficiency.
+
+**Model Variants**:
+
+* 🚀 **Z-Image-Turbo** – A distilled version that matches or exceeds leading competitors with only **8 NFEs** (Number of Function Evaluations). It offers **sub-second inference latency** on enterprise-grade H800 GPUs and fits within **16GB VRAM consumer devices**.
+* 🧱 **Z-Image-Base** – The non-distilled foundation model for community-driven fine-tuning and custom development.
+* ✍️ **Z-Image-Edit** – A variant fine-tuned for image editing tasks with impressive instruction-following capabilities.
+
+**Model Highlights**:
+
+* **Photorealistic Quality**: Delivers strong photorealistic image generation while maintaining excellent aesthetic quality
+* **Accurate Bilingual Text Rendering**: Excels at accurately rendering complex Chinese and English text
+* **Prompt Enhancing & Reasoning**: Prompt Enhancer empowers the model with reasoning capabilities
+* **Sub-second Inference**: Achieves fast generation speed on supported hardware
+
+**Related Links**:
+
+* [GitHub](https://github.com/Tongyi-MAI/Z-Image)
+* [Hugging Face](https://huggingface.co/Tongyi-MAI/Z-Image-Turbo)
+
+## Z-Image-Turbo text-to-image workflow
+
+<CardGroup cols={2}>
+  <Card title="Download Workflow" icon="download" href="https://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_z_image_turbo.json">
+    Download the Z-Image-Turbo text-to-image workflow JSON file.
+  </Card>
+
+  <Card title="Run on ComfyUI Cloud" icon="cloud" href="https://cloud.comfy.org/?template=image_z_image_turbo&utm_source=docs&utm_medium=inhouse_social&utm_campaign=z_image_launch">
+    Run this workflow directly on ComfyUI Cloud.
+  </Card>
+</CardGroup>
+
+<Tip>
+  <Tabs>
+    <Tab title="Portable or self deployed users">
+      Make sure your ComfyUI is updated.
+
+      * [Download ComfyUI](https://www.comfy.org/download)
+      * [Update Guide](/installation/update_comfyui)
+
+      Workflows in this guide can be found in the [Workflow Templates](/interface/features/template).
+      If you can't find them in the template, your ComfyUI may be outdated. (Desktop version's update will delay sometime)
+
+      If nodes are missing when loading a workflow, possible reasons:
+
+      1. You are not using the latest ComfyUI version (Nightly version)
+      2. Some nodes failed to import at startup
+    </Tab>
+
+    <Tab title="Desktop or Cloud users">
+      * The Desktop is base on ComfyUI stable release, it will auto-update when there is a new Desktop stable release available.
+      * [Cloud](https://cloud.comfy.org) will update after ComfyUI stable release.
+
+      So, if you find any core node missing in this document, it might be because the new core nodes have not yet been released in the latest stable version. Please wait for the next stable release.
+    </Tab>
+  </Tabs>
+</Tip>
+
+### Z-Image-Turbo model downloads
+
+<CardGroup cols={2}>
+  <Card title="qwen_3_4b.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors">
+    Text encoder for Z-Image-Turbo.
+  </Card>
+
+  <Card title="z_image_turbo_bf16.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors">
+    Diffusion model for Z-Image-Turbo.
+  </Card>
+
+  <Card title="ae.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors">
+    VAE for Z-Image-Turbo.
+  </Card>
+</CardGroup>
+
+**Z-Image-Turbo Model Storage Location**
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 text_encoders/
+│   │      └── qwen_3_4b.safetensors
+│   ├── 📂 diffusion_models/
+│   │      └── z_image_turbo_bf16.safetensors
+│   └── 📂 vae/
+│          └── ae.safetensors
+```
+
+## Z-Image-Turbo Fun Union ControlNet workflow
+
+This workflow uses the Z-Image-Turbo Fun Union ControlNet model to generate images with ControlNet guidance. It applies Canny edge detection to a reference image and uses the ControlNet to guide the generation process.
+
+<CardGroup cols={1}>
+  <Card title="Download Workflow" icon="download" href="https://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_z_image_turbo_fun_union_controlnet.json">
+    Download the Z-Image-Turbo Fun Union ControlNet workflow JSON file.
+  </Card>
+</CardGroup>
+
+### Additional model for ControlNet
+
+<CardGroup cols={1}>
+  <Card title="Z-Image-Turbo-Fun-Controlnet-Union.safetensors" icon="download" href="https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union/resolve/main/Z-Image-Turbo-Fun-Controlnet-Union.safetensors">
+    ControlNet model patch for Z-Image-Turbo.
+  </Card>
+</CardGroup>
+
+**Model Storage Location**
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 text_encoders/
+│   │      └── qwen_3_4b.safetensors
+│   ├── 📂 diffusion_models/
+│   │      └── z_image_turbo_bf16.safetensors
+│   ├── 📂 vae/
+│   │      └── ae.safetensors
+│   └── 📂 model_patches/
+│          └── Z-Image-Turbo-Fun-Controlnet-Union.safetensors
+```

@@ -1,0 +1,81 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.comfy.org/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# FAQs about Partner Nodes
+
+> Some FAQs you may encounter when using Partner Nodes.
+
+This article addresses common questions regarding the use of Partner nodes.
+
+<AccordionGroup>
+  <Accordion title="Why can't I find the API nodes?">
+    Please update your ComfyUI to the latest version (the latest commit or the latest [desktop version](https://www.comfy.org/download)).
+    We may add more API support in the future, and the corresponding nodes will be updated, so please keep your ComfyUI up to date.
+
+    <Tip>
+      Please note that you need to distinguish between the nightly version and the release version.
+      In some cases, the latest `release` version may not be updated in time compared to the `nightly` version.
+      Since we are still iterating quickly, please ensure you are using the latest version when you cannot find the corresponding node.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Why can't I use / log in to the API Nodes?">
+    API access requires that your current request is based on a secure network environment. The current requirements for API access are as follows:
+
+    * The local network only allows access from `127.0.0.1` or `localhost`, which may mean that you cannot use the API Nodes in a ComfyUI service started with the `--listen` parameter in a LAN environment.
+    * Able to access our API service normally (a proxy service may be required in some regions).
+    * Your account does not have enough [credits](/interface/credits).
+  </Accordion>
+
+  <Accordion title="Why can't I use API node even after logging in, or why does it keep asking me to log in while using?">
+    * Currently, only `127.0.0.1` or `localhost` access is supported.
+    * Ensure your account has enough credits.
+  </Accordion>
+
+  <Accordion title="Can API Nodes be used for free?">
+    API Nodes require credits for API calls to closed-source models, so they do not support free usage.
+  </Accordion>
+
+  <Accordion title="How to purchase credits?">
+    Please refer to the following documentation:
+
+    1. [Comfy Account](/interface/user): Find the `User` section in the settings menu to log in.
+    2. [Credits](/interface/credits): After logging in, the settings interface will show the credits menu. You can purchase credits in `Settings` → `Credits`. We use a prepaid system, so there will be no unexpected charges.
+    3. Complete the payment through Stripe.
+    4. Check if the credits have been updated. If not, try restarting or refreshing the page.
+  </Accordion>
+
+  <Accordion title="Are unused credits refundable?">
+    Currently, we do not support refunds for credits.
+    If you believe there is an error resulting in unused balance due to technical issues, please [contact support](mailto:support@comfy.org).
+  </Accordion>
+
+  <Accordion title="Can credits go negative?">
+    Credits are not intended to be used as a negative balance or credit line. However, due to race conditions where partner nodes don't always report costs before execution, a single execution may consume more credits than your remaining balance and temporarily result in a negative balance after completion. When your balance is negative, you will not be able to run Partner Nodes until you top up and restore a positive balance. Please ensure you have enough credits before making API calls.
+  </Accordion>
+
+  <Accordion title="Where can I check usage and expenses?">
+    Please visit the [Credits](/interface/credits) menu after logging in to check the corresponding credits.
+  </Accordion>
+
+  <Accordion title="Is it possible to use my own API Key?">
+    Currently, the API Nodes are still in the testing phase and do not support this feature yet, but we have considered adding it.
+  </Accordion>
+
+  <Accordion title="Do credits expire?">
+    No, your credits do not expire.
+  </Accordion>
+
+  <Accordion title="Can credits be transferred or shared?">
+    No, your credits cannot be transferred to other users and are limited to the currently logged-in account, but we do not restrict the number of devices that can log in.
+  </Accordion>
+
+  <Accordion title="Can I use the same account on different devices?">
+    We do not limit the number of devices that can log in; you can use your account anywhere you want.
+  </Accordion>
+
+  <Accordion title="How can I request for my account or information to be deleted??">
+    Email a request to [support@comfy.org](mailto:support@comfy.org) and we will delete your information
+  </Accordion>
+</AccordionGroup>

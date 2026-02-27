@@ -1,0 +1,169 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.comfy.org/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Kling Text to Video - ComfyUI 原生节点文档
+
+> 使用Kling的AI技术将文本描述转换为视频的节点
+
+<img src="https://mintcdn.com/dripart/5003JSxULDwNImme/images/built-in-nodes/api_nodes/kwai_vgi/kling-text-to-video.jpg?fit=max&auto=format&n=5003JSxULDwNImme&q=85&s=7ddc3d180854e9a1e836154b3f36a58d" alt="ComfyUI 原生 Kling Text to Video 节点" data-og-width="1731" width="1731" data-og-height="1754" height="1754" data-path="images/built-in-nodes/api_nodes/kwai_vgi/kling-text-to-video.jpg" data-optimize="true" data-opv="3" srcset="https://mintcdn.com/dripart/5003JSxULDwNImme/images/built-in-nodes/api_nodes/kwai_vgi/kling-text-to-video.jpg?w=280&fit=max&auto=format&n=5003JSxULDwNImme&q=85&s=cfb616771ecd124d2ea552d2d09b13d8 280w, https://mintcdn.com/dripart/5003JSxULDwNImme/images/built-in-nodes/api_nodes/kwai_vgi/kling-text-to-video.jpg?w=560&fit=max&auto=format&n=5003JSxULDwNImme&q=85&s=8d751c1208fd40972b584bc03d13272f 560w, https://mintcdn.com/dripart/5003JSxULDwNImme/images/built-in-nodes/api_nodes/kwai_vgi/kling-text-to-video.jpg?w=840&fit=max&auto=format&n=5003JSxULDwNImme&q=85&s=806374902d147d57dd7e7a83ec596706 840w, https://mintcdn.com/dripart/5003JSxULDwNImme/images/built-in-nodes/api_nodes/kwai_vgi/kling-text-to-video.jpg?w=1100&fit=max&auto=format&n=5003JSxULDwNImme&q=85&s=355b23eced44dfaaef83039be2eab4ef 1100w, https://mintcdn.com/dripart/5003JSxULDwNImme/images/built-in-nodes/api_nodes/kwai_vgi/kling-text-to-video.jpg?w=1650&fit=max&auto=format&n=5003JSxULDwNImme&q=85&s=87fb90578eb9f7974474937f4d0feb16 1650w, https://mintcdn.com/dripart/5003JSxULDwNImme/images/built-in-nodes/api_nodes/kwai_vgi/kling-text-to-video.jpg?w=2500&fit=max&auto=format&n=5003JSxULDwNImme&q=85&s=a1a8a546c809016b9413d5f9a728aca2 2500w" />
+
+Kling Text to Video 节点通过连接Kling的API服务，实现文本到视频的生成功能。用户只需提供描述性文本，即可创建对应的视频内容。
+
+## 参数说明
+
+### 必需参数
+
+| 参数               | 类型  | 默认值               | 说明                |
+| ---------------- | --- | ----------------- | ----------------- |
+| prompt           | 字符串 | ""                | 描述要生成视频内容的文本提示词   |
+| negative\_prompt | 字符串 | ""                | 指定不希望在视频中出现的元素    |
+| cfg\_scale       | 浮点数 | 7.0               | 配置缩放值，控制对提示词的遵循程度 |
+| model\_name      | 选择项 | "kling-v2-master" | 使用的视频生成模型         |
+| aspect\_ratio    | 选择项 | AspectRatio枚举值    | 输出视频的宽高比          |
+| duration         | 选择项 | Duration枚举值       | 生成视频的持续时间         |
+| mode             | 选择项 | Mode枚举值           | 视频生成模式            |
+
+### 输出
+
+| 输出             | 类型  | 说明      |
+| -------------- | --- | ------- |
+| VIDEO          | 视频  | 生成的视频结果 |
+| Kling ID       | 字符串 | 任务识别ID  |
+| Duration (sec) | 字符串 | 视频时长（秒） |
+
+## 工作原理
+
+节点将文本提示词发送到Kling的API服务器，系统处理后返回生成的视频结果。处理过程包括初始请求和任务状态轮询，当任务完成后，节点会下载视频并输出结果。
+
+用户可以通过调整各种参数来控制生成效果，包括负面提示词、配置缩放值以及视频属性等。系统会验证提示词长度，确保请求符合API要求。
+
+## 源码参考
+
+\[节点源码 (更新于2025-05-03)]
+
+```python  theme={null}
+
+class KlingTextToVideoNode(KlingNodeBase):
+    """Kling Text to Video Node"""
+
+    @staticmethod
+    def poll_for_task_status(task_id: str, auth_token: str) -> KlingText2VideoResponse:
+        """Polls the Kling API endpoint until the task reaches a terminal state."""
+        polling_operation = PollingOperation(
+            poll_endpoint=ApiEndpoint(
+                path=f"{PATH_TEXT_TO_VIDEO}/{task_id}",
+                method=HttpMethod.GET,
+                request_model=EmptyRequest,
+                response_model=KlingText2VideoResponse,
+            ),
+            completed_statuses=[
+                TaskStatus.succeed.value,
+            ],
+            failed_statuses=[TaskStatus.failed.value],
+            status_extractor=lambda response: (
+                response.data.task_status.value
+                if response.data and response.data.task_status
+                else None
+            ),
+            auth_token=auth_token,
+        )
+        return polling_operation.execute()
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "prompt": model_field_to_node_input(
+                    IO.STRING, KlingText2VideoRequest, "prompt", multiline=True
+                ),
+                "negative_prompt": model_field_to_node_input(
+                    IO.STRING, KlingText2VideoRequest, "negative_prompt", multiline=True
+                ),
+                "model_name": model_field_to_node_input(
+                    IO.COMBO,
+                    KlingText2VideoRequest,
+                    "model_name",
+                    enum_type=ModelName,
+                    default="kling-v2-master",
+                ),
+                "cfg_scale": model_field_to_node_input(
+                    IO.FLOAT, KlingText2VideoRequest, "cfg_scale"
+                ),
+                "mode": model_field_to_node_input(
+                    IO.COMBO, KlingText2VideoRequest, "mode", enum_type=Mode
+                ),
+                "duration": model_field_to_node_input(
+                    IO.COMBO, KlingText2VideoRequest, "duration", enum_type=Duration
+                ),
+                "aspect_ratio": model_field_to_node_input(
+                    IO.COMBO,
+                    KlingText2VideoRequest,
+                    "aspect_ratio",
+                    enum_type=AspectRatio,
+                ),
+            },
+            "hidden": {"auth_token": "AUTH_TOKEN_COMFY_ORG"},
+        }
+
+    RETURN_TYPES = ("VIDEO", "STRING", "STRING")
+    RETURN_NAMES = ("VIDEO", "Kling ID", "Duration (sec)")
+    DESCRIPTION = "Kling Text to Video Node"
+
+    def api_call(
+        self,
+        prompt: str,
+        negative_prompt: str,
+        model_name: str,
+        cfg_scale: float,
+        mode: str,
+        duration: int,
+        aspect_ratio: str,
+        camera_control: Optional[CameraControl] = None,
+        auth_token: Optional[str] = None,
+    ) -> tuple[VideoFromFile, str, str]:
+        validate_prompts(prompt, negative_prompt, MAX_PROMPT_LENGTH_T2V)
+        initial_operation = SynchronousOperation(
+            endpoint=ApiEndpoint(
+                path=PATH_TEXT_TO_VIDEO,
+                method=HttpMethod.POST,
+                request_model=KlingText2VideoRequest,
+                response_model=KlingText2VideoResponse,
+            ),
+            request=KlingText2VideoRequest(
+                prompt=prompt if prompt else None,
+                negative_prompt=negative_prompt if negative_prompt else None,
+                duration=Duration(duration),
+                mode=Mode(mode),
+                model_name=ModelName(model_name),
+                cfg_scale=cfg_scale,
+                aspect_ratio=AspectRatio(aspect_ratio),
+                camera_control=camera_control,
+            ),
+            auth_token=auth_token,
+        )
+
+        initial_response = initial_operation.execute()
+        if not is_valid_initial_response(initial_response):
+            error_msg = f"Kling initial request failed. Code: {initial_response.code}, Message: {initial_response.message}, Data: {initial_response.data}"
+            logging.error(error_msg)
+            raise KlingApiError(error_msg)
+
+        task_id = initial_response.data.task_id
+        final_response = self.poll_for_task_status(task_id, auth_token)
+        if not is_valid_video_response(final_response):
+            error_msg = (
+                f"Kling task {task_id} succeeded but no video data found in response."
+            )
+            logging.error(error_msg)
+            raise KlingApiError(error_msg)
+
+        video = final_response.data.task_result.videos[0]
+        logging.debug("Kling task %s succeeded. Video URL: %s", task_id, video.url)
+        return (
+            download_url_to_video_output(video.url),
+            str(video.id),
+            str(video.duration),
+        )
+
+```

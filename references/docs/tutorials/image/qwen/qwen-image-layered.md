@@ -1,0 +1,107 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.comfy.org/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# Qwen-Image-Layered ComfyUI Workflow Example
+
+> Qwen-Image-Layered is a model capable of decomposing an image into multiple RGBA layers, enabling inherent editability through layer decomposition.
+
+**Qwen-Image-Layered** is a model developed by Alibaba's Qwen team that can decompose an image into multiple RGBA layers. This layered representation unlocks inherent editability: each layer can be independently manipulated without affecting other content.
+
+**Key Features**:
+
+* **Inherent Editability**: Each layer can be independently manipulated without affecting other content
+* **High-Fidelity Elementary Operations**: Supports resizing, repositioning, and recoloring with physical isolation of semantic components
+* **Variable-Layer Decomposition**: Not limited to a fixed number of layers - decompose into 3, 4, 8, or more layers as needed
+* **Recursive Decomposition**: Any layer can be further decomposed, enabling infinite decomposition depth
+
+**Related Links**:
+
+* [Hugging Face](https://huggingface.co/Qwen/Qwen-Image-Layered)
+* [Research Paper](https://arxiv.org/abs/2512.15603)
+* [Blog](https://qwenlm.github.io/blog/qwen-image-layered/)
+
+## Qwen-Image-Layered workflow
+
+<a className="prose" target="_blank" href="https://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/image_qwen_image_layered.json" style={{ display: 'inline-block', backgroundColor: '#0078D6', color: '#ffffff', padding: '10px 20px', borderRadius: '8px', borderColor: "transparent", textDecoration: 'none', fontWeight: 'bold', marginRight: '10px'}}>
+  <p className="prose" style={{ margin: 0, fontSize: "0.8rem" }}>Download JSON Workflow File</p>
+</a>
+
+<a className="prose" target="_blank" href="https://cloud.comfy.org/?template=image_qwen_image_layered&utm_source=docs" style={{ display: 'inline-block', backgroundColor: '#28a745', color: '#ffffff', padding: '10px 20px', borderRadius: '8px', borderColor: "transparent", textDecoration: 'none', fontWeight: 'bold'}}>
+  <p className="prose" style={{ margin: 0, fontSize: "0.8rem" }}>Run on ComfyUI Cloud</p>
+</a>
+
+<Tip>
+  <Tabs>
+    <Tab title="Portable or self deployed users">
+      Make sure your ComfyUI is updated.
+
+      * [Download ComfyUI](https://www.comfy.org/download)
+      * [Update Guide](/installation/update_comfyui)
+
+      Workflows in this guide can be found in the [Workflow Templates](/interface/features/template).
+      If you can't find them in the template, your ComfyUI may be outdated. (Desktop version's update will delay sometime)
+
+      If nodes are missing when loading a workflow, possible reasons:
+
+      1. You are not using the latest ComfyUI version (Nightly version)
+      2. Some nodes failed to import at startup
+    </Tab>
+
+    <Tab title="Desktop or Cloud users">
+      * The Desktop is base on ComfyUI stable release, it will auto-update when there is a new Desktop stable release available.
+      * [Cloud](https://cloud.comfy.org) will update after ComfyUI stable release.
+
+      So, if you find any core node missing in this document, it might be because the new core nodes have not yet been released in the latest stable version. Please wait for the next stable release.
+    </Tab>
+  </Tabs>
+</Tip>
+
+## Model links
+
+**text\_encoders**
+
+* [qwen\_2.5\_vl\_7b\_fp8\_scaled.safetensors](https://huggingface.co/Comfy-Org/HunyuanVideo_1.5_repackaged/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors)
+
+**diffusion\_models**
+
+* [qwen\_image\_layered\_bf16.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image-Layered_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_layered_bf16.safetensors)
+
+**vae**
+
+* [qwen\_image\_layered\_vae.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image-Layered_ComfyUI/resolve/main/split_files/vae/qwen_image_layered_vae.safetensors)
+
+**Model Storage Location**
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 text_encoders/
+│   │      └── qwen_2.5_vl_7b_fp8_scaled.safetensors
+│   ├── 📂 diffusion_models/
+│   │      └── qwen_image_layered_bf16.safetensors
+│   └── 📂 vae/
+│          └── qwen_image_layered_vae.safetensors
+```
+
+## FP8 version
+
+By default we are using bf16, which requires high VRAM. For lower VRAM usage, you can use the fp8 version:
+
+* [qwen\_image\_layered\_fp8mixed.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image-Layered_ComfyUI/blob/main/split_files/diffusion_models/qwen_image_layered_fp8mixed.safetensors)
+
+Then update the **Load Diffusion model** node inside the [Subgraph](/interface/features/subgraph) to use it.
+
+## Workflow settings
+
+### Sampler settings
+
+This model is slow. The original sampling settings are steps: 50 and CFG: 4.0, which will at least double the generation time.
+
+### Input size
+
+For input size, 640px is recommended. Use 1024px for high-resolution output.
+
+### Prompt (optional)
+
+The text prompt is intended to describe the overall content of the input image—including elements that may be partially occluded (e.g., you may specify the text hidden behind a foreground object). It is not designed to control the semantic content of individual layers explicitly.

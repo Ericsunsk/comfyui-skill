@@ -1,0 +1,469 @@
+# ComfyUI
+
+## Docs
+
+- [Create a Comfy account](https://docs.comfy.org/account/create-account.md): Learn how to create a new Comfy account for ComfyUI to access all features and services.
+- [Delete your Comfy account](https://docs.comfy.org/account/delete-account.md): Learn how to permanently delete your Comfy account for ComfyUI and associated data.
+- [Log in to your Comfy account](https://docs.comfy.org/account/login.md): Access your Comfy account for ComfyUI to use all platform features and services.
+- [Generate a short-lived JWT admin token](https://docs.comfy.org/api-reference/admin/generate-a-short-lived-jwt-admin-token.md): Generates a short-lived JWT admin token for browser-based admin operations.
+The user must already be authenticated with Firebase and have admin privileges.
+The generated token expires after 1 hour.
+
+- [Get proxyvidutasks creations](https://docs.comfy.org/api-reference/api-nodes/get-proxyvidutasks-creations.md)
+- [Post proxyviduextend](https://docs.comfy.org/api-reference/api-nodes/post-proxyviduextend.md)
+- [Post proxyviduimg2video](https://docs.comfy.org/api-reference/api-nodes/post-proxyviduimg2video.md)
+- [Post proxyvidumultiframe](https://docs.comfy.org/api-reference/api-nodes/post-proxyvidumultiframe.md)
+- [Post proxyvidureference2video](https://docs.comfy.org/api-reference/api-nodes/post-proxyvidureference2video.md)
+- [Post proxyvidustart end2video](https://docs.comfy.org/api-reference/api-nodes/post-proxyvidustart-end2video.md)
+- [Post proxyvidutext2video](https://docs.comfy.org/api-reference/api-nodes/post-proxyvidutext2video.md)
+- [Add tags to asset](https://docs.comfy.org/api-reference/cloud/asset/add-tags-to-asset.md): Adds one or more tags to an existing asset
+- [Check if asset exists by hash](https://docs.comfy.org/api-reference/cloud/asset/check-if-asset-exists-by-hash.md): Checks if content with the given hash exists in cloud storage.
+Returns 200 if the content exists, 404 if it doesn't.
+Useful for checking availability before using `/api/assets/from-hash`.
+
+- [Create asset reference from existing hash](https://docs.comfy.org/api-reference/cloud/asset/create-asset-reference-from-existing-hash.md): Creates a new asset reference using an existing hash from cloud storage.
+This avoids re-uploading file content when the underlying data already exists,
+which is useful for large files or when referencing well-known assets.
+The user provides their own metadata and tags for the new reference.
+
+- [Delete asset](https://docs.comfy.org/api-reference/cloud/asset/delete-asset.md): Deletes an asset and its content from storage.
+Both the database record and storage content are deleted.
+
+- [Get asset details](https://docs.comfy.org/api-reference/cloud/asset/get-asset-details.md): Retrieves detailed information about a specific asset
+- [Get asset metadata from remote URL](https://docs.comfy.org/api-reference/cloud/asset/get-asset-metadata-from-remote-url.md): Retrieves metadata for an asset from a remote download URL without downloading the entire file.
+Supports various sources including CivitAI and other model repositories.
+Uses HEAD requests or API calls to fetch metadata efficiently.
+This endpoint is for previewing metadata before downloading, not for getting metadata of existing assets.
+
+- [Get tag histogram for filtered assets](https://docs.comfy.org/api-reference/cloud/asset/get-tag-histogram-for-filtered-assets.md): Returns a histogram of tags appearing on assets matching the given filters.
+Useful for refining asset searches by showing available tags and their counts.
+Only returns tags with non-zero counts (tags that exist on matching assets).
+
+- [Initiate background download for large files](https://docs.comfy.org/api-reference/cloud/asset/initiate-background-download-for-large-files.md): Initiates a background download job for large files from Huggingface or Civitai.
+
+If the file already exists in storage, the asset record is created immediately and returned (200 OK).
+If the file doesn't exist, a background task is created and the task ID is returned (202 Accepted).
+The frontend can track progress using GET /api/tasks/{task_id}.
+
+- [List all tags](https://docs.comfy.org/api-reference/cloud/asset/list-all-tags.md): Retrieves a list of all tags used across assets.
+Includes usage counts and filtering options.
+
+- [List user assets](https://docs.comfy.org/api-reference/cloud/asset/list-user-assets.md): Retrieves a paginated list of assets belonging to the authenticated user.
+Supports filtering by tags, name, metadata, and sorting options.
+
+- [Remove tags from asset](https://docs.comfy.org/api-reference/cloud/asset/remove-tags-from-asset.md): Removes one or more tags from an existing asset
+- [Update asset metadata](https://docs.comfy.org/api-reference/cloud/asset/update-asset-metadata.md): Updates an asset's metadata. At least one field must be provided.
+Only name, tags, and user_metadata can be updated.
+
+- [Upload a new asset](https://docs.comfy.org/api-reference/cloud/asset/upload-a-new-asset.md): Uploads a new asset to the system with associated metadata.
+Supports two upload methods:
+1. Direct file upload (multipart/form-data)
+2. URL-based upload (application/json with source: "url")
+
+If an asset with the same hash already exists, returns the existing asset.
+
+- [Get related mask layer files](https://docs.comfy.org/api-reference/cloud/file/get-related-mask-layer-files.md): Given a mask file (any of the 4 layers), returns all related mask layer files.
+This is used by the mask editor to load the paint, mask, and painted layers
+when reopening a previously edited mask.
+
+- [Upload a mask image](https://docs.comfy.org/api-reference/cloud/file/upload-a-mask-image.md): Upload a mask image to be applied to an existing image
+- [Upload an image file](https://docs.comfy.org/api-reference/cloud/file/upload-an-image-file.md): Upload an image file to cloud storage
+- [View a file](https://docs.comfy.org/api-reference/cloud/file/view-a-file.md): Retrieve and view a file from the ComfyUI file system.
+This endpoint is typically used to view generated images or other output files.
+
+- [Get execution history (v2)](https://docs.comfy.org/api-reference/cloud/job/get-execution-history-v2.md): Retrieve execution history for the authenticated user with pagination support.
+Returns a lightweight history format with filtered prompt data (workflow removed from extra_pnginfo).
+
+- [Get full job details](https://docs.comfy.org/api-reference/cloud/job/get-full-job-details.md): Retrieve complete details for a specific job including workflow and outputs.
+Used for detail views, workflow re-execution, and debugging.
+
+- [Get history for specific prompt](https://docs.comfy.org/api-reference/cloud/job/get-history-for-specific-prompt.md): Retrieve detailed execution history for a specific prompt ID.
+Returns full history data including complete prompt information.
+
+- [Get job status](https://docs.comfy.org/api-reference/cloud/job/get-job-status.md): Returns the current status of a specific job by ID
+- [Get queue information](https://docs.comfy.org/api-reference/cloud/job/get-queue-information.md): Returns information about running and pending items in the queue
+- [Interrupt currently running jobs](https://docs.comfy.org/api-reference/cloud/job/interrupt-currently-running-jobs.md): Cancel all currently RUNNING jobs for the authenticated user.
+This will interrupt any job that is currently in 'in_progress' status.
+Note: This endpoint only affects running jobs. To cancel pending jobs, use /api/queue.
+
+- [List jobs with pagination and filtering](https://docs.comfy.org/api-reference/cloud/job/list-jobs-with-pagination-and-filtering.md): Retrieve a paginated list of jobs for the authenticated user.
+Returns lightweight job data optimized for list views.
+Workflow and full outputs are excluded to reduce payload size.
+
+- [Manage execution history](https://docs.comfy.org/api-reference/cloud/job/manage-execution-history.md): Clear all history for the authenticated user or delete specific job IDs.
+Supports clearing all history or deleting specific job IDs.
+
+- [Manage queue operations](https://docs.comfy.org/api-reference/cloud/job/manage-queue-operations.md): Cancel specific PENDING jobs by ID or clear all pending jobs in the queue.
+Note: This endpoint only affects pending jobs. To cancel running jobs, use /api/interrupt.
+
+- [Get available model folders](https://docs.comfy.org/api-reference/cloud/model/get-available-model-folders.md): Returns a list of model folders available in the system.
+This is an experimental endpoint that replaces the legacy /models endpoint.
+
+- [Get model preview image](https://docs.comfy.org/api-reference/cloud/model/get-model-preview-image.md): Returns a preview image for the specified model.
+The image is returned in WebP format for optimal performance.
+
+- [Get models in a specific folder](https://docs.comfy.org/api-reference/cloud/model/get-models-in-a-specific-folder.md): Returns a list of models available in the specified folder.
+This is an experimental endpoint that provides enhanced model information.
+
+- [Get all node information](https://docs.comfy.org/api-reference/cloud/node/get-all-node-information.md): Returns information about all available nodes
+- [Get server feature flags](https://docs.comfy.org/api-reference/cloud/node/get-server-feature-flags.md): Returns the server's feature capabilities
+- [Get system statistics](https://docs.comfy.org/api-reference/cloud/system/get-system-statistics.md): Returns system statistics including ComfyUI version, device info, and system resources
+- [Delete a user data file](https://docs.comfy.org/api-reference/cloud/user/delete-a-user-data-file.md): Delete a user data file from the database. The file parameter should be
+the relative path within the user's data directory.
+
+- [Get current user information](https://docs.comfy.org/api-reference/cloud/user/get-current-user-information.md): Returns information about the currently authenticated user
+- [Get user data file](https://docs.comfy.org/api-reference/cloud/user/get-user-data-file.md): Returns the requested user data file if it exists.
+- [List user data files](https://docs.comfy.org/api-reference/cloud/user/list-user-data-files.md): Returns a list of user data files in the specified directory, optionally recursively and with full metadata.
+- [Upload or update a user data file](https://docs.comfy.org/api-reference/cloud/user/upload-or-update-a-user-data-file.md): Upload a file to a user's data directory. Optional query parameters allow
+control over overwrite behavior and response detail.
+
+- [Get a specific subgraph blueprint](https://docs.comfy.org/api-reference/cloud/workflow/get-a-specific-subgraph-blueprint.md): Returns the full data for a specific subgraph blueprint by ID
+- [Get available subgraph blueprints](https://docs.comfy.org/api-reference/cloud/workflow/get-available-subgraph-blueprints.md): Returns a list of globally available subgraph blueprints.
+These are pre-built workflow components that can be used as nodes.
+The data field contains a promise that resolves to the full subgraph JSON.
+
+- [Get available workflow templates](https://docs.comfy.org/api-reference/cloud/workflow/get-available-workflow-templates.md): Returns available workflow templates
+- [Get information about current prompt execution](https://docs.comfy.org/api-reference/cloud/workflow/get-information-about-current-prompt-execution.md): Returns information about the current prompt in the execution queue
+- [Submit a workflow for execution](https://docs.comfy.org/api-reference/cloud/workflow/submit-a-workflow-for-execution.md): Submit a workflow to be executed by the backend.
+The workflow is a JSON object describing the nodes and their connections.
+
+- [Get the status of one skin enhancer task](https://docs.comfy.org/api-reference/freepik/get-the-status-of-one-skin-enhancer-task.md): Get the status of a skin enhancer task (works for both Creative and Faithful modes)
+- [Get the status of the Precision V2 upscaling task](https://docs.comfy.org/api-reference/freepik/get-the-status-of-the-precision-v2-upscaling-task.md): Returns the current status and output URL of a specific precision upscaler V2 task.
+- [Get the status of the relight task](https://docs.comfy.org/api-reference/freepik/get-the-status-of-the-relight-task.md): Get the status of the relight task
+- [Get the status of the style transfer task](https://docs.comfy.org/api-reference/freepik/get-the-status-of-the-style-transfer-task.md): Get the status of the style transfer task
+- [Get the status of the upscaling task](https://docs.comfy.org/api-reference/freepik/get-the-status-of-the-upscaling-task.md): Get the status of the upscaling task
+- [Relight an image](https://docs.comfy.org/api-reference/freepik/relight-an-image.md): Relight an image using AI. This endpoint accepts a variety of parameters to customize the generated images.
+
+- [Skin enhancer using AI (Creative)](https://docs.comfy.org/api-reference/freepik/skin-enhancer-using-ai-creative.md): Enhance skin in images using AI with the Creative mode. This mode provides more artistic and stylized enhancements.
+- [Skin enhancer using AI (Faithful)](https://docs.comfy.org/api-reference/freepik/skin-enhancer-using-ai-faithful.md): Enhance skin in images using AI with the Faithful mode. This mode preserves the original appearance while improving skin quality.
+- [Skin enhancer using AI (Flexible)](https://docs.comfy.org/api-reference/freepik/skin-enhancer-using-ai-flexible.md): Enhance skin in images using AI with the Flexible mode. This mode allows you to choose the optimization target for the enhancement.
+- [Style transfer an image](https://docs.comfy.org/api-reference/freepik/style-transfer-an-image.md): Style transfer an image using AI.
+- [Upscale an image with Magnific](https://docs.comfy.org/api-reference/freepik/upscale-an-image-with-magnific.md): This asynchronous endpoint enables image upscaling using advanced AI algorithms.
+Upon submission, it returns a unique task_id which can be used to track the progress.
+For real-time production use, include the optional webhook_url parameter to receive
+an automated notification once the task has been completed.
+
+- [Upscale an image with Precision V2](https://docs.comfy.org/api-reference/freepik/upscale-an-image-with-precision-v2.md): Upscales an image while adding new visual elements or details (V2).
+This endpoint may modify the original image content based on the prompt and inferred context.
+Upon submission, it returns a unique task_id which can be used to track the progress.
+
+- [Add review to a specific version of a node](https://docs.comfy.org/api-reference/registry/add-review-to-a-specific-version-of-a-node.md)
+- [Claim nodeId into publisherId for the authenticated publisher](https://docs.comfy.org/api-reference/registry/claim-nodeid-into-publisherid-for-the-authenticated-publisher.md): This endpoint allows a publisher to claim an unclaimed node that they own the repo, which is identified by the nodeId. The unclaimed node's repository must be owned by the authenticated user.
+
+- [Create a new custom node](https://docs.comfy.org/api-reference/registry/create-a-new-custom-node.md)
+- [Create a new personal access token](https://docs.comfy.org/api-reference/registry/create-a-new-personal-access-token.md)
+- [Create a new publisher](https://docs.comfy.org/api-reference/registry/create-a-new-publisher.md)
+- [create comfy-nodes for certain node](https://docs.comfy.org/api-reference/registry/create-comfy-nodes-for-certain-node.md)
+- [Create Node Translations](https://docs.comfy.org/api-reference/registry/create-node-translations.md)
+- [Delete a publisher](https://docs.comfy.org/api-reference/registry/delete-a-publisher.md)
+- [Delete a specific node](https://docs.comfy.org/api-reference/registry/delete-a-specific-node.md)
+- [Delete a specific personal access token](https://docs.comfy.org/api-reference/registry/delete-a-specific-personal-access-token.md)
+- [Get information about the calling user.](https://docs.comfy.org/api-reference/registry/get-information-about-the-calling-user.md)
+- [Get server feature flags](https://docs.comfy.org/api-reference/registry/get-server-feature-flags.md): Returns the server's feature capabilities
+- [get specify comfy-node based on its id](https://docs.comfy.org/api-reference/registry/get-specify-comfy-node-based-on-its-id.md)
+- [list all comfy-nodes](https://docs.comfy.org/api-reference/registry/list-all-comfy-nodes.md)
+- [List all node versions given some filters.](https://docs.comfy.org/api-reference/registry/list-all-node-versions-given-some-filters.md)
+- [List all versions of a node](https://docs.comfy.org/api-reference/registry/list-all-versions-of-a-node.md)
+- [list comfy-nodes for node version](https://docs.comfy.org/api-reference/registry/list-comfy-nodes-for-node-version.md)
+- [Publish a new version of a node](https://docs.comfy.org/api-reference/registry/publish-a-new-version-of-a-node.md)
+- [Retrieve a node by ComfyUI node name](https://docs.comfy.org/api-reference/registry/retrieve-a-node-by-comfyui-node-name.md): Returns the node that contains a ComfyUI node with the specified name
+- [Retrieve a publisher by ID](https://docs.comfy.org/api-reference/registry/retrieve-a-publisher-by-id.md)
+- [Retrieve a specific node by ID](https://docs.comfy.org/api-reference/registry/retrieve-a-specific-node-by-id.md): Returns the details of a specific node.
+- [Retrieve a specific version of a node](https://docs.comfy.org/api-reference/registry/retrieve-a-specific-version-of-a-node.md)
+- [Retrieve all nodes](https://docs.comfy.org/api-reference/registry/retrieve-all-nodes.md)
+- [Retrieve all nodes](https://docs.comfy.org/api-reference/registry/retrieve-all-nodes-1.md)
+- [Retrieve all publishers](https://docs.comfy.org/api-reference/registry/retrieve-all-publishers.md)
+- [Retrieve all publishers for a given user](https://docs.comfy.org/api-reference/registry/retrieve-all-publishers-for-a-given-user.md)
+- [Retrieve multiple node versions in a single request](https://docs.comfy.org/api-reference/registry/retrieve-multiple-node-versions-in-a-single-request.md)
+- [Retrieve permissions the user has for a given publisher](https://docs.comfy.org/api-reference/registry/retrieve-permissions-the-user-has-for-a-given-publisher.md)
+- [Retrieve permissions the user has for a given publisher](https://docs.comfy.org/api-reference/registry/retrieve-permissions-the-user-has-for-a-given-publisher-1.md)
+- [Retrieves a list of nodes](https://docs.comfy.org/api-reference/registry/retrieves-a-list-of-nodes.md): Returns a paginated list of nodes across all publishers.
+- [Retrieves a list of nodes](https://docs.comfy.org/api-reference/registry/retrieves-a-list-of-nodes-1.md): Returns a paginated list of nodes across all publishers.
+- [Returns a node version to be installed.](https://docs.comfy.org/api-reference/registry/returns-a-node-version-to-be-installed.md): Retrieves the node data for installation, either the latest or a specific version.
+- [Unpublish (delete) a specific version of a node](https://docs.comfy.org/api-reference/registry/unpublish-delete-a-specific-version-of-a-node.md)
+- [Update a publisher](https://docs.comfy.org/api-reference/registry/update-a-publisher.md)
+- [Update a specific comfy-node](https://docs.comfy.org/api-reference/registry/update-a-specific-comfy-node.md)
+- [Update a specific node](https://docs.comfy.org/api-reference/registry/update-a-specific-node.md)
+- [Update changelog and deprecation status of a node version](https://docs.comfy.org/api-reference/registry/update-changelog-and-deprecation-status-of-a-node-version.md): Update only the changelog and deprecated status of a specific version of a node.
+- [Validate if a publisher username is available](https://docs.comfy.org/api-reference/registry/validate-if-a-publisher-username-is-available.md): Checks if the publisher username is already taken.
+- [Get release notes](https://docs.comfy.org/api-reference/releases/get-release-notes.md): Fetch release notes from Strapi with caching
+- [BasicScheduler - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/BasicScheduler.md): The BasicScheduler node is used to compute a sequence of sigma values for diffusion models based on the provided scheduler, model, and denoising parameters.
+- [Canny - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/Canny.md): The Canny node used to extract edge lines from photos.
+- [CheckpointLoaderSimple - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/CheckpointLoaderSimple.md): The CheckpointLoaderSimple node is used to load model files from specified locations and decompose them into three core components: the main model, text encoder, and image encoder/decoder.
+- [ClipLoader - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipLoader.md): The ClipLoader node is used to load CLIP text encoder models independently.
+- [ClipMergeSimple - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipMergeSimple.md): The ClipMergeSimple node is used to combine two CLIP text encoder models based on a specified ratio.
+- [ClipSave - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipSave.md): The ClipSave node is used to save CLIP text encoder models in SafeTensors format.
+- [ClipSetLastLayer - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipSetLastLayer.md): The ClipSetLastLayer node is used to control the processing depth of CLIP models.
+- [ClipTextEncode - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipTextEncode.md): The ClipTextEncode node is used to convert text prompts into AI-understandable 'language' for image generation.
+- [ClipTextEncodeFlux - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipTextEncodeFlux.md): The ClipTextEncodeFlux node is used to encode text prompts into Flux-compatible conditioning embeddings.
+- [ClipTextEncodeHunyuanDit - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipTextEncodeHunyuanDit.md): The ClipTextEncodeHunyuanDit node is used to encode text prompts into HunyuanDiT-compatible conditioning embeddings.
+- [ClipTextEncodeSdxl - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipTextEncodeSdxl.md): The ClipTextEncodeSdxl node is used to encode text prompts into SDXL-compatible conditioning embeddings.
+- [ClipTextEncodeSdxlRefiner - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipTextEncodeSdxlRefiner.md): The ClipTextEncodeSdxlRefiner node is used to encode text prompts into SDXL Refiner-compatible conditioning embeddings.
+- [ClipVisionEncode - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipVisionEncode.md): The ClipVisionEncode node is used to encode input images into visual feature vectors through the CLIP Vision model.
+- [Load CLIP Vision - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/ClipVisionLoader.md): The Load CLIP Vision node is used to load CLIP Vision models from the `ComfyUI/models/clip_vision` folder.
+- [Load3D - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/Load3D.md): The Load3D node is a core node in ComfyUI for loading and previewing various 3D model files, supporting multi-format import and rich three-dimensional view operations.
+- [Wan Vace To Video - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/conditioning/video-models/wan-vace-to-video.md): Create videos using Alibaba Tongyi Wanxiang's high-resolution video generation API
+- [TrimVideoLatent Node](https://docs.comfy.org/built-in-nodes/latent/video/trim-video-latent.md): Trim video frames in latent space
+- [ComfyUI Built-in Nodes](https://docs.comfy.org/built-in-nodes/overview.md): Introduction to ComfyUI Built-in Nodes
+- [Flux 1.1 [pro] Ultra Image - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/bfl/flux-1-1-pro-ultra-image.md): Create images using Black Forest Labs' high-resolution image generation API
+- [Ideogram V1 - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/ideogram/ideogram-v1.md): Node for creating precise text rendering images using Ideogram API
+- [Ideogram V2 - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/ideogram/ideogram-v2.md): Node for creating high-quality images and text rendering using Ideogram V2 API
+- [Ideogram V3 - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/ideogram/ideogram-v3.md): Node for creating top-quality images and text rendering using Ideogram's latest V3 API
+- [Luma Image to Image - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/luma/luma-image-to-image.md): Node for modifying images using Luma AI
+- [Luma Reference - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/luma/luma-reference.md): Helper node providing reference images for Luma image generation
+- [Luma Text to Image - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/luma/luma-text-to-image.md): A node that converts text descriptions into high-quality images using Luma AI
+- [OpenAI DALL·E 2 - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/openai/openai-dalle2.md): Node for generating images using OpenAI's DALL·E 2 model
+- [OpenAI DALL·E 3 - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/openai/openai-dalle3.md): Node for generating high-quality images using OpenAI's DALL·E 3 model
+- [OpenAI GPT Image 1 - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/openai/openai-gpt-image1.md): Node for generating images using OpenAI's GPT-4 Vision model
+- [Recraft Color RGB - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-color-rgb.md): Helper node for defining color controls in Recraft image generation
+- [Recraft Controls - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-controls.md): Node providing advanced control parameters for Recraft image generation
+- [Recraft Creative Upscale - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-creative-upscale.md): A Recraft Partner node that uses AI to creatively enhance image details and resolution
+- [Recraft Crisp Upscale - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-crisp-upscale.md): A Recraft Partner node that enhances image clarity and resolution using AI
+- [Recraft Image Inpainting - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-image-inpainting.md): Selectively modify image regions using Recraft API
+- [Recraft Image to Image - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-image-to-image.md): A Recraft Partner node that generates new images based on text prompts and reference images
+- [Recraft Remove Background - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-remove-background.md): A Recraft Partner node that automatically removes image backgrounds and creates transparent alpha channels
+- [Recraft Replace Background - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-replace-background.md): A Recraft Partner node that automatically detects foreground subjects and replaces backgrounds
+- [Recraft Style - Digital Illustration - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-style-digital-illustration.md): A helper node for setting digital illustration style in Recraft image generation
+- [Recraft Style - Logo Raster - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-style-logo-raster.md): Helper node for setting logo raster style in Recraft image generation
+- [Recraft Style - Realistic Image - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-style-realistic-image.md): A helper node for setting realistic photo style in Recraft image generation
+- [Recraft Text to Image - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-text-to-image.md): A Recraft Partner node that generates high-quality images from text descriptions
+- [Recraft Text to Vector - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-text-to-vector.md): A Recraft Partner node that generates scalable vector graphics from text descriptions
+- [Recraft Vectorize Image - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/recraft-vectorize-image.md): A Recraft Partner node that converts raster images to vector SVG format
+- [Save SVG - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/recraft/save-svg.md): A utility node for saving SVG vector graphics to files
+- [Stability AI Stable Diffusion 3.5 - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/stability-ai/stability-ai-stable-diffusion-3-5-image.md): A node that generates high-quality images using Stability AI Stable Diffusion 3.5 model
+- [Stability Stable Image Ultra - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/image/stability-ai/stability-ai-stable-image-ultra.md): A node that generates high-quality images using Stability AI's ultra stable diffusion model
+- [Google Veo2 Video - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/google/google-veo2-video.md): A node that generates videos from text descriptions using Google's Veo2 technology
+- [Kling Image to Video (Camera Control) - ComfyUI Built-in Node](https://docs.comfy.org/built-in-nodes/partner-node/video/kwai_vgi/kling-camera-control-i2v.md): Image to video conversion node with camera control features
+- [Kling Text to Video (Camera Control) - ComfyUI Built-in Node](https://docs.comfy.org/built-in-nodes/partner-node/video/kwai_vgi/kling-camera-control-t2v.md): A text to video generation node with camera control features
+- [Kling Camera Controls - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/kwai_vgi/kling-camera-controls.md): A node that provides camera control parameters for Kling video generation
+- [Kling Image to Video - ComfyUI Built-in Node](https://docs.comfy.org/built-in-nodes/partner-node/video/kwai_vgi/kling-image-to-video.md): A node that converts static images to dynamic videos using Kling's AI technology
+- [Kling Start-End Frame to Video - ComfyUI Built-in Node](https://docs.comfy.org/built-in-nodes/partner-node/video/kwai_vgi/kling-start-end-frame-to-video.md): A node that creates smooth video transitions between start and end frames using Kling's AI technology
+- [Kling Text to Video - ComfyUI Built-in Node](https://docs.comfy.org/built-in-nodes/partner-node/video/kwai_vgi/kling-text-to-video.md): A node that converts text descriptions into videos using Kling's AI technology
+- [Luma Concepts - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/luma/luma-concepts.md): A helper node that provides concept guidance for Luma image generation
+- [Luma Image to Video - ComfyUI Native API Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/luma/luma-image-to-video.md): A node that converts static images to dynamic videos using Luma AI
+- [Luma Text to Video - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/luma/luma-text-to-video.md): A node that converts text descriptions to videos using Luma AI
+- [MiniMax Image to Video - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/minimax/minimax-image-to-video.md): A node that converts static images to dynamic videos using MiniMax AI
+- [MiniMax Text to Video - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/minimax/minimax-text-to-video.md): A node that converts text descriptions into videos using MiniMax AI
+- [Pika 2.2 Image to Video - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/pika/pika-image-to-video.md): A node that converts static images to dynamic videos using Pika AI
+- [Pika 2.2 Scenes - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/pika/pika-scenes.md): A node that creates coherent scene videos from multiple images using Pika AI
+- [Pika 2.2 Text to Video - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/pika/pika-text-to-video.md): A node that converts text descriptions into videos using Pika AI
+- [PixVerse Image to Video - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/pixverse/pixverse-image-to-video.md): A node that converts static images to dynamic videos using PixVerse AI
+- [PixVerse Template - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/pixverse/pixverse-template.md): A helper node that provides preset templates for PixVerse video generation
+- [PixVerse Text to Video - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/pixverse/pixverse-text-to-video.md): A node that converts text descriptions into videos using PixVerse AI technology
+- [PixVerse Transition Video - ComfyUI Native Node Documentation](https://docs.comfy.org/built-in-nodes/partner-node/video/pixverse/pixverse-transition-video.md): Create smooth transition videos between start and end frames using PixVerse AI
+- [Ksampler - ComfyUI Built-in Node Documentation](https://docs.comfy.org/built-in-nodes/sampling/ksampler.md): The Ksampler node is a commonly used sampling node in ComfyUI.
+- [Changelog](https://docs.comfy.org/changelog/index.md): Track ComfyUI's latest features, improvements, and bug fixes. For detailed release notes, see the [Github releases](https://github.com/comfyanonymous/ComfyUI/releases) page.
+- [Import models](https://docs.comfy.org/cloud/import-models.md): Learn how to import models from Civitai and Hugging Face to Comfy Cloud
+- [Getting Started](https://docs.comfy.org/comfy-cli/getting-started.md)
+- [Reference](https://docs.comfy.org/comfy-cli/reference.md)
+- [Getting Started](https://docs.comfy.org/comfy-cli/troubleshooting.md)
+- [Contributing](https://docs.comfy.org/community/contributing.md)
+- [Community links](https://docs.comfy.org/community/links.md): Connect with the ComfyUI community through various platforms
+- [Datatypes](https://docs.comfy.org/custom-nodes/backend/datatypes.md)
+- [Node Expansion](https://docs.comfy.org/custom-nodes/backend/expansion.md)
+- [Images, Latents, and Masks](https://docs.comfy.org/custom-nodes/backend/images_and_masks.md)
+- [Lazy Evaluation](https://docs.comfy.org/custom-nodes/backend/lazy_evaluation.md)
+- [Lifecycle](https://docs.comfy.org/custom-nodes/backend/lifecycle.md)
+- [Data lists](https://docs.comfy.org/custom-nodes/backend/lists.md)
+- [Hidden and Flexible inputs](https://docs.comfy.org/custom-nodes/backend/more_on_inputs.md)
+- [Node replacement](https://docs.comfy.org/custom-nodes/backend/node-replacement.md): Register node replacements to help users migrate from deprecated nodes
+- [Properties](https://docs.comfy.org/custom-nodes/backend/server_overview.md): Properties of a custom node
+- [Annotated Examples](https://docs.comfy.org/custom-nodes/backend/snippets.md)
+- [Working with torch.Tensor](https://docs.comfy.org/custom-nodes/backend/tensors.md)
+- [Add node docs for your ComfyUI custom node](https://docs.comfy.org/custom-nodes/help_page.md): How to create rich documentation for your custom nodes
+- [ComfyUI Custom Nodes i18n Support](https://docs.comfy.org/custom-nodes/i18n.md): Learn how to add multi-language support for ComfyUI custom nodes
+- [Context Menu Migration Guide](https://docs.comfy.org/custom-nodes/js/context-menu-migration.md)
+- [About Panel Badges](https://docs.comfy.org/custom-nodes/js/javascript_about_panel_badges.md)
+- [Bottom Panel Tabs](https://docs.comfy.org/custom-nodes/js/javascript_bottom_panel_tabs.md)
+- [Commands and Keybindings](https://docs.comfy.org/custom-nodes/js/javascript_commands_keybindings.md)
+- [Dialog API](https://docs.comfy.org/custom-nodes/js/javascript_dialog.md)
+- [Annotated Examples](https://docs.comfy.org/custom-nodes/js/javascript_examples.md)
+- [Comfy Hooks](https://docs.comfy.org/custom-nodes/js/javascript_hooks.md)
+- [Comfy Objects](https://docs.comfy.org/custom-nodes/js/javascript_objects_and_hijacking.md)
+- [Javascript Extensions](https://docs.comfy.org/custom-nodes/js/javascript_overview.md)
+- [Selection Toolbox](https://docs.comfy.org/custom-nodes/js/javascript_selection_toolbox.md)
+- [Settings](https://docs.comfy.org/custom-nodes/js/javascript_settings.md)
+- [Sidebar Tabs](https://docs.comfy.org/custom-nodes/js/javascript_sidebar_tabs.md)
+- [Toast API](https://docs.comfy.org/custom-nodes/js/javascript_toast.md)
+- [Topbar Menu](https://docs.comfy.org/custom-nodes/js/javascript_topbar_menu.md)
+- [Subgraphs](https://docs.comfy.org/custom-nodes/js/subgraphs.md): Working with subgraphs in ComfyUI extensions: node IDs, graph traversal, events, widget promotion, and cleanup.
+- [Overview](https://docs.comfy.org/custom-nodes/overview.md)
+- [Subgraph blueprints](https://docs.comfy.org/custom-nodes/subgraph_blueprints.md)
+- [V3 Migration](https://docs.comfy.org/custom-nodes/v3_migration.md): How to migrate your existing V1 nodes to the new V3 schema.
+- [Getting Started](https://docs.comfy.org/custom-nodes/walkthrough.md)
+- [Workflow templates](https://docs.comfy.org/custom-nodes/workflow_templates.md)
+- [Cloud API Reference](https://docs.comfy.org/development/cloud/api-reference.md): Complete API reference with code examples for Comfy Cloud
+- [OpenAPI Specification](https://docs.comfy.org/development/cloud/openapi.md): Machine-readable OpenAPI specification for Comfy Cloud API
+- [Cloud API Overview](https://docs.comfy.org/development/cloud/overview.md): Programmatic access to Comfy Cloud for running workflows, managing files, and monitoring execution
+- [ComfyUI Account API Key Integration](https://docs.comfy.org/development/comfyui-server/api-key-integration.md): This article explains how to use ComfyUI Account API Key to call paid API nodes in headless mode
+- [Messages](https://docs.comfy.org/development/comfyui-server/comms_messages.md)
+- [Server Overview](https://docs.comfy.org/development/comfyui-server/comms_overview.md)
+- [Routes](https://docs.comfy.org/development/comfyui-server/comms_routes.md)
+- [Execution Model Inversion Guide](https://docs.comfy.org/development/comfyui-server/execution_model_inversion_guide.md)
+- [Custom Nodes](https://docs.comfy.org/development/core-concepts/custom-nodes.md): Learn about installing, enabling dependencies, updating, disabling, and uninstalling custom nodes in ComfyUI
+- [Dependencies](https://docs.comfy.org/development/core-concepts/dependencies.md): Understand dependencies in ComfyUI
+- [Links](https://docs.comfy.org/development/core-concepts/links.md): Understand connection links in ComfyUI
+- [Models](https://docs.comfy.org/development/core-concepts/models.md)
+- [Nodes](https://docs.comfy.org/development/core-concepts/nodes.md): Understand the concept of a node in ComfyUI.
+- [Properties](https://docs.comfy.org/development/core-concepts/properties.md)
+- [Workflow](https://docs.comfy.org/development/core-concepts/workflow.md)
+- [Overview](https://docs.comfy.org/development/overview.md): Using ComfyUI as a Developer
+- [Comfy Cloud](https://docs.comfy.org/get_started/cloud.md): Get started with Comfy Cloud to run ComfyUI workflows in the cloud without local installation
+- [Getting Started with AI Image Generation](https://docs.comfy.org/get_started/first_generation.md): This tutorial will guide you through your first image generation with ComfyUI, covering basic interface operations like workflow loading, model installation, and image generation
+- [ComfyUI Official Documentation](https://docs.comfy.org/index.md): ComfyUI Official Documentation
+- [ComfyUI(portable) Windows](https://docs.comfy.org/installation/comfyui_portable_windows.md): This tutorial will guide you on how to download and start using ComfyUI Portable and run the corresponding programs
+- [Linux Desktop Version](https://docs.comfy.org/installation/desktop/linux.md): This article introduces how to download, install and use ComfyUI Desktop for Linux
+- [MacOS Desktop Version](https://docs.comfy.org/installation/desktop/macos.md): This article introduces how to download, install and use ComfyUI Desktop for MacOS
+- [Windows Desktop Version](https://docs.comfy.org/installation/desktop/windows.md): This article introduces how to download, install and use ComfyUI Desktop for Windows
+- [How to Install Custom Nodes in ComfyUI](https://docs.comfy.org/installation/install_custom_node.md): This guide will show you different methods to install custom nodes in ComfyUI
+- [How to install ComfyUI manually in different systems](https://docs.comfy.org/installation/manual_install.md)
+- [System Requirements](https://docs.comfy.org/installation/system_requirements.md): This guide introduces some system requirements for ComfyUI, including hardware and software requirements
+- [How to Update ComfyUI](https://docs.comfy.org/installation/update_comfyui.md): This section provides a comprehensive guide to updating ComfyUI
+- [Customizing ComfyUI Appearance](https://docs.comfy.org/interface/appearance.md): Learn how to customize the appearance of ComfyUI using color palettes and advanced CSS options
+- [Credits Management](https://docs.comfy.org/interface/credits.md): In this article, we will introduce ComfyUI's credit management features, including how to obtain, use, and view credits.
+- [Node docs - View documentation for any node](https://docs.comfy.org/interface/features/node-docs.md): Learn how to access built-in documentation for nodes in ComfyUI, including both built-in and custom nodes.
+- [Partial Execution - Run Only Part of Your workflow in ComfyUI](https://docs.comfy.org/interface/features/partial-execution.md): How to use and the requirements for the Partial Execution feature in ComfyUI
+- [Subgraph - Simplify your workflow](https://docs.comfy.org/interface/features/subgraph.md): An introduction to the Subgraph feature in ComfyUI, including how to create, navigate, and manage subgraphs.
+- [Templates - ComfyUI Built-in Workflow Templates](https://docs.comfy.org/interface/features/template.md): Templates provide model workflows natively supported by ComfyUI and example workflows from custom nodes. You can find and use workflows for currently supported models here.
+- [Mask Editor - Create and Edit Masks in ComfyUI](https://docs.comfy.org/interface/maskeditor.md): Learn how to use the Mask Editor in ComfyUI, including settings and usage instructions
+- [Nodes 2.0](https://docs.comfy.org/interface/nodes-2.md): Learn about Nodes 2.0, the new Vue-based node rendering system in ComfyUI that enables faster development and richer interactions.
+- [ComfyUI Interface Overview](https://docs.comfy.org/interface/overview.md): In this article, we will briefly introduce the basic user interface of ComfyUI, familiarizing you with the various parts of the ComfyUI interface.
+- [ComfyUI 3D Settings](https://docs.comfy.org/interface/settings/3d.md): Detailed description of ComfyUI 3D setting options
+- [About Page](https://docs.comfy.org/interface/settings/about.md): Detailed description of ComfyUI About settings page
+- [Comfy Settings](https://docs.comfy.org/interface/settings/comfy.md): Detailed description of ComfyUI core setting options
+- [Comfy Desktop General Settings](https://docs.comfy.org/interface/settings/comfy-desktop.md): Detailed description of ComfyUI Desktop general setting options
+- [Extension Settings](https://docs.comfy.org/interface/settings/extension.md): Detailed description of ComfyUI extension management and setting options
+- [ComfyUI LiteGraph (Canvas) Settings](https://docs.comfy.org/interface/settings/lite-graph.md): Detailed description of ComfyUI graphics rendering engine LiteGraph setting options
+- [ComfyUI Mask Editor Settings](https://docs.comfy.org/interface/settings/mask-editor.md): Detailed description of ComfyUI mask editor setting options
+- [ComfyUI Settings Overview](https://docs.comfy.org/interface/settings/overview.md): Detailed description of ComfyUI settings overview
+- [Server Config](https://docs.comfy.org/interface/settings/server-config.md): Detailed description of ComfyUI server configuration options
+- [ComfyUI Keyboard Shortcuts and Custom Settings](https://docs.comfy.org/interface/shortcuts.md): Keyboard and mouse shortcuts for ComfyUI and related settings
+- [Account Management](https://docs.comfy.org/interface/user.md): In this document, we will introduce the account management features of ComfyUI, including account login, registration, and logout operations.
+- [Configuration](https://docs.comfy.org/manager/configuration.md): Configure ComfyUI-Manager settings
+- [ComfyUI-Manager Installation](https://docs.comfy.org/manager/install.md): How to install ComfyUI-Manager for different setups
+- [Managing custom nodes with ComfyUI-Manager (legacy UI)](https://docs.comfy.org/manager/legacy-ui.md): Install, update, and manage custom nodes with ComfyUI-Manager using the legacy interface
+- [Overview](https://docs.comfy.org/manager/overview.md): An extension to manage custom nodes, models, and more in ComfyUI
+- [Custom nodes (new UI)](https://docs.comfy.org/manager/pack-management.md): Install, update, and manage custom nodes with ComfyUI-Manager using the new interface
+- [Troubleshooting](https://docs.comfy.org/manager/troubleshooting.md): Resolve common ComfyUI-Manager issues
+- [Custom Node CI/CD](https://docs.comfy.org/registry/cicd.md)
+- [Claim My Node](https://docs.comfy.org/registry/claim-my-node.md)
+- [Overview](https://docs.comfy.org/registry/overview.md)
+- [Publishing Nodes](https://docs.comfy.org/registry/publishing.md)
+- [pyproject.toml](https://docs.comfy.org/registry/specifications.md)
+- [Standards](https://docs.comfy.org/registry/standards.md): Security and other standards for publishing to the Registry
+- [Node Definition JSON](https://docs.comfy.org/specs/nodedef_json.md): JSON schema for a ComfyUI Node.
+- [Node Definition JSON 1.0](https://docs.comfy.org/specs/nodedef_json_1_0.md): JSON schema for a ComfyUI Node.
+- [Workflow JSON](https://docs.comfy.org/specs/workflow_json.md): JSON schema for a ComfyUI workflow.
+- [Workflow JSON 0.4](https://docs.comfy.org/specs/workflow_json_0.4.md): JSON schema for a ComfyUI workflow.
+- [Contact support](https://docs.comfy.org/support/contact-support.md): Get help and report issues for ComfyUI
+- [Accepted payment methods](https://docs.comfy.org/support/payment/accepted-payment-methods.md): Learn about the payment methods accepted by Comfy Organization Inc
+- [Editing your payment information](https://docs.comfy.org/support/payment/editing-payment-information.md): Learn how to update your payment method and billing details
+- [Invoice information](https://docs.comfy.org/support/payment/invoice-information.md): Learn how your invoice information is managed
+- [Payment currency](https://docs.comfy.org/support/payment/payment-currency.md): Information about supported currencies and currency conversion
+- [Viewing your payment history](https://docs.comfy.org/support/payment/payment-history.md): Access and review your past payments and invoices
+- [Unsuccessful payments](https://docs.comfy.org/support/payment/unsuccessful-payments.md): Understand why payments fail and how to resolve payment issues
+- [Canceling your Comfy Cloud subscription](https://docs.comfy.org/support/subscription/canceling.md): Learn how to cancel your Comfy Cloud subscription
+- [Changing your subscription plan](https://docs.comfy.org/support/subscription/changing-plan.md): Learn how to change your Comfy Cloud subscription plan
+- [Managing your Comfy Cloud subscription](https://docs.comfy.org/support/subscription/managing.md): Learn how to manage your Comfy Cloud subscription
+- [Subscribing to Comfy Cloud](https://docs.comfy.org/support/subscription/subscribing.md): Learn how to subscribe to Comfy Cloud
+- [How to Troubleshoot and Solve ComfyUI Issues](https://docs.comfy.org/troubleshooting/custom-node-issues.md): Troubleshoot and fix problems caused by custom nodes and extensions
+- [How to Troubleshoot and Solve ComfyUI Model Issues](https://docs.comfy.org/troubleshooting/model-issues.md): Troubleshooting model-related problems including architecture mismatches, missing models, and loading errors
+- [How to Troubleshoot and Solve ComfyUI Issues](https://docs.comfy.org/troubleshooting/overview.md): Common ComfyUI issues, solutions, and how to report bugs effectively
+- [ComfyUI Hunyuan3D-2 Examples](https://docs.comfy.org/tutorials/3d/hunyuan3D-2.md): This guide will demonstrate how to use Hunyuan3D-2 in ComfyUI to generate 3D assets.
+- [ComfyUI ACE-Step Native Example](https://docs.comfy.org/tutorials/audio/ace-step/ace-step-v1.md): This guide will help you create dynamic music using the ACE-Step model in ComfyUI
+- [ComfyUI ACE-Step 1.5 Music Generation Guide](https://docs.comfy.org/tutorials/audio/ace-step/ace-step-v1-5.md): Learn how to use ACE-Step 1.5 for AI music generation in ComfyUI. Complete guide with workflows, model downloads, and setup instructions for ComfyUI.
+- [ComfyUI Image to Image Workflow](https://docs.comfy.org/tutorials/basic/image-to-image.md): This guide will help you understand and complete an image to image workflow
+- [ComfyUI Inpainting Workflow](https://docs.comfy.org/tutorials/basic/inpaint.md): This guide will introduce you to the inpainting workflow in ComfyUI, walk you through an inpainting example, and cover topics like using the mask editor
+- [ComfyUI LoRA Example](https://docs.comfy.org/tutorials/basic/lora.md): This guide will help you understand and use a single LoRA model
+- [ComfyUI Multiple LoRAs Example](https://docs.comfy.org/tutorials/basic/multiple-loras.md): This guide demonstrates how to apply multiple LoRA models simultaneously in ComfyUI
+- [ComfyUI Outpainting Workflow Example](https://docs.comfy.org/tutorials/basic/outpaint.md): This guide will introduce you to the outpainting workflow in ComfyUI and walk you through an outpainting example
+- [ComfyUI Text to Image Workflow](https://docs.comfy.org/tutorials/basic/text-to-image.md): This guide will help you understand the concept of text-to-image in AI art generation and complete a text-to-image workflow in ComfyUI
+- [ComfyUI Image Upscale Workflow](https://docs.comfy.org/tutorials/basic/upscale.md): This guide explains the concept of image upscaling in AI drawing and demonstrates how to implement an image upscaling workflow in ComfyUI
+- [ComfyUI ControlNet Usage Example](https://docs.comfy.org/tutorials/controlnet/controlnet.md): This guide will introduce you to the basic concepts of ControlNet and demonstrate how to generate corresponding images in ComfyUI
+- [ComfyUI Depth ControlNet Usage Example](https://docs.comfy.org/tutorials/controlnet/depth-controlnet.md): This guide will introduce you to the basic concepts of Depth ControlNet and demonstrate how to generate corresponding images in ComfyUI
+- [ComfyUI Depth T2I Adapter Usage Example](https://docs.comfy.org/tutorials/controlnet/depth-t2i-adapter.md): This guide will introduce you to the basic concepts of Depth T2I Adapter and demonstrate how to generate corresponding images in ComfyUI
+- [ComfyUI Mixing ControlNet Examples](https://docs.comfy.org/tutorials/controlnet/mixing-controlnets.md): In this example, we will demonstrate how to mix multiple ControlNets and learn to use multiple ControlNet models to control image generation
+- [ComfyUI Pose ControlNet Usage Example](https://docs.comfy.org/tutorials/controlnet/pose-controlnet-2-pass.md): This guide will introduce you to the basic concepts of Pose ControlNet, and demonstrate how to generate large-sized images in ComfyUI using a two-pass generation approach
+- [ComfyUI Flux.1 ControlNet Examples](https://docs.comfy.org/tutorials/flux/flux-1-controlnet.md): This guide will demonstrate workflow examples using Flux.1 ControlNet.
+- [ComfyUI Flux.1 fill dev Example](https://docs.comfy.org/tutorials/flux/flux-1-fill-dev.md): This guide demonstrates how to use Flux.1 fill dev to create Inpainting and Outpainting workflows.
+- [ComfyUI Flux Kontext Dev Native Workflow Example](https://docs.comfy.org/tutorials/flux/flux-1-kontext-dev.md): ComfyUI Flux Kontext Dev Native Workflow Example.
+- [ComfyUI Flux.1 Text-to-Image Workflow Example](https://docs.comfy.org/tutorials/flux/flux-1-text-to-image.md): This guide provides a brief introduction to the Flux.1 model and guides you through using the Flux.1 model for text-to-image generation with examples including the full version and the FP8 Checkpoint version.
+- [ByteDance USO ComfyUI Native Workflow example](https://docs.comfy.org/tutorials/flux/flux-1-uso.md): Unified Style and Subject-Driven Generation with ByteDance's USO model
+- [ComfyUI Flux.2 Dev Example](https://docs.comfy.org/tutorials/flux/flux-2-dev.md): This guide provides a brief introduction to the Flux.2 model and guides you through using the Flux.2 Dev model for text-to-image generation in ComfyUI.
+- [ComfyUI Flux.2 Klein 4B Guide](https://docs.comfy.org/tutorials/flux/flux-2-klein.md): A quick introduction to FLUX.2 [klein] 4B and how to run text-to-image and image editing workflows in ComfyUI.
+- [Flux.1 Krea Dev ComfyUI Workflow Tutorial](https://docs.comfy.org/tutorials/flux/flux1-krea-dev.md): Best open-source FLUX model developed by Black Forest Labs in collaboration with Krea, focusing on unique aesthetic style and natural details, avoiding AI look, providing exceptional realism and image quality.
+- [Cosmos Predict2 Text-to-Image ComfyUI Official Example](https://docs.comfy.org/tutorials/image/cosmos/cosmos-predict2-t2i.md): This guide demonstrates how to complete Cosmos-Predict2 text-to-image workflow in ComfyUI
+- [ComfyUI Native HiDream-E1, E1.1 Workflow Example](https://docs.comfy.org/tutorials/image/hidream/hidream-e1.md): This guide will help you understand and complete the ComfyUI native HiDream-I1 text-to-image workflow example
+- [ComfyUI Native HiDream-I1 Text-to-Image Workflow Example](https://docs.comfy.org/tutorials/image/hidream/hidream-i1.md): This guide will walk you through completing a ComfyUI native HiDream-I1 text-to-image workflow example
+- [ComfyUI NewBie-image-Exp0.1 Workflow Example](https://docs.comfy.org/tutorials/image/newbie-image/newbie-image-exp-0-1.md): NewBie-image-Exp0.1 is a 3.5B parameter anime-style text-to-image generation model based on Next-DiT architecture, optimized for high-quality anime image generation with XML structured prompts.
+- [ComfyUI OmniGen2 Native Workflow Examples](https://docs.comfy.org/tutorials/image/omnigen/omnigen2.md): ComfyUI OmniGen2 Native Workflow Examples - Unified text-to-image, image editing, and multi-image composition model.
+- [Ovis-Image ComfyUI Workflow Example](https://docs.comfy.org/tutorials/image/ovis/ovis-image.md): Ovis-Image is a 7B text-to-image model specifically optimized for high-quality text rendering, designed to operate efficiently under stringent computational constraints.
+- [Qwen-Image ComfyUI Native Workflow Example](https://docs.comfy.org/tutorials/image/qwen/qwen-image.md): Qwen-Image is a 20B parameter MMDiT (Multimodal Diffusion Transformer) model open-sourced under the Apache 2.0 license.
+- [Qwen-Image-2512 ComfyUI Native Workflow Example](https://docs.comfy.org/tutorials/image/qwen/qwen-image-2512.md): Qwen-Image-2512 is the December update of Qwen-Image's text-to-image foundational model, featuring enhanced human realism, finer natural detail, and improved text rendering.
+- [Qwen-Image-Edit ComfyUI Native Workflow Example](https://docs.comfy.org/tutorials/image/qwen/qwen-image-edit.md): Qwen-Image-Edit is the image editing version of Qwen-Image, further trained based on the 20B model, supporting precise text editing and dual semantic/appearance editing capabilities.
+- [Qwen-Image-Edit-2511 ComfyUI Native Workflow Example](https://docs.comfy.org/tutorials/image/qwen/qwen-image-edit-2511.md): Qwen-Image-Edit-2511 is an enhanced version of Qwen-Image-Edit, featuring improved character consistency, multi-person editing, integrated LoRA capabilities, and enhanced geometric reasoning.
+- [Qwen-Image-Layered ComfyUI Workflow Example](https://docs.comfy.org/tutorials/image/qwen/qwen-image-layered.md): Qwen-Image-Layered is a model capable of decomposing an image into multiple RGBA layers, enabling inherent editability through layer decomposition.
+- [Z-Image ComfyUI Workflow Example](https://docs.comfy.org/tutorials/image/z-image/z-image.md): Z-Image is a 6B parameter efficient image generation foundation model with single-stream diffusion transformer for community-driven fine-tuning and custom development.
+- [Z-Image-Turbo ComfyUI Workflow Example](https://docs.comfy.org/tutorials/image/z-image/z-image-turbo.md): Z-Image-Turbo is a distilled 6B parameter efficient image generation model with sub-second inference latency.
+- [Flux 1.1 Pro Ultra Image API Node ComfyUI Official Workflow Examples](https://docs.comfy.org/tutorials/partner-nodes/black-forest-labs/flux-1-1-pro-ultra-image.md): This guide covers how to use the Flux 1.1 Pro Ultra Image Partner node in ComfyUI
+- [ComfyUI Flux.1 Kontext Pro Image API Node Official Example](https://docs.comfy.org/tutorials/partner-nodes/black-forest-labs/flux-1-kontext.md): This guide will show you how to use the Flux.1 Kontext Pro Image Partner node in ComfyUI to perform image editing
+- [Bria FIBO Edit API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/bria/fibo.md): Learn how to use the Bria FIBO Edit Partner node for precision image editing in ComfyUI
+- [ByteDance Seedream 5.0 Lite - Smart AI Image Creation](https://docs.comfy.org/tutorials/partner-nodes/bytedance/seedream-5-lite.md): Generate images with web-connected retrieval and enhanced instruction following using Seedream 5.0 lite in ComfyUI
+- [FAQs about Partner Nodes](https://docs.comfy.org/tutorials/partner-nodes/faq.md): Some FAQs you may encounter when using Partner Nodes.
+- [Google Gemini API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/google/gemini.md): This article will introduce how to use Google Gemini Partner nodes in ComfyUI to complete conversational functions
+- [Nano Banana Pro and ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/google/nano-banana-pro.md): This article will introduce how to use Google's Nano Banana Pro (Gemini 3 Pro Image) in ComfyUI for high-fidelity image generation and editing
+- [Hunyuan 3D API Node Model Generation ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/hunyuan3d/hunyuan3d-3-0.md): This article will introduce how to use Hunyuan 3D node's API in ComfyUI for 3D model generation
+- [ComfyUI Ideogram 3.0 API Node Official Examples](https://docs.comfy.org/tutorials/partner-nodes/ideogram/ideogram-v3.md): This guide covers how to use the Ideogram 3.0 Partner node in ComfyUI
+- [Kling 3.0 Video and Image Generation in ComfyUI](https://docs.comfy.org/tutorials/partner-nodes/kling/kling-3-0.md): Learn how to use Kling 3.0 models in ComfyUI for multi-shot video generation, subject consistency, multilingual audio, and native text rendering
+- [Kling 2.6 Motion Control API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/kling/kling-motion-control.md): Learn how to use the Kling 2.6 Motion Control Partner node in ComfyUI for precise motion transfer from reference videos to character images
+- [Luma Image to Image API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/luma/luma-image-to-image.md): This guide covers how to use the Luma Image to Image Partner node in ComfyUI
+- [Luma Image to Video API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/luma/luma-image-to-video.md): Learn how to use the Luma Image to Video Partner node in ComfyUI
+- [Luma Text to Image API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/luma/luma-text-to-image.md): This guide explains how to use the Luma Text to Image Partner node in ComfyUI
+- [Luma Text to Video API Node ComfyUI Official Guide](https://docs.comfy.org/tutorials/partner-nodes/luma/luma-text-to-video.md): Learn how to use the Luma Text to Video Partner node in ComfyUI
+- [Meshy 6 API Node Model Generation ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/meshy/meshy-6.md): This article will introduce how to use Meshy 6 node's API in ComfyUI for 3D model generation
+- [Moonvalley API Node Official ComfyUI Example](https://docs.comfy.org/tutorials/partner-nodes/moonvalley/moonvalley-video-generation.md): This article introduces how to use Moonvalley Partner nodes for text-to-video, image-to-video, and video-to-video capabilities in ComfyUI.
+- [OpenAI Chat API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/openai/chat.md): This article will introduce how to use OpenAI Chat Partner nodes in ComfyUI to complete conversational functions
+- [OpenAI DALL·E 2 Node](https://docs.comfy.org/tutorials/partner-nodes/openai/dall-e-2.md): Learn how to use the OpenAI DALL·E 2 Partner node to generate images in ComfyUI
+- [OpenAI DALL·E 3 Node](https://docs.comfy.org/tutorials/partner-nodes/openai/dall-e-3.md): Learn how to use the OpenAI DALL·E 3 Partner node to generate images in ComfyUI
+- [OpenAI GPT-Image-1 Node](https://docs.comfy.org/tutorials/partner-nodes/openai/gpt-image-1.md): Learn how to use the OpenAI GPT-Image-1 Partner node to generate images in ComfyUI
+- [Partner Nodes](https://docs.comfy.org/tutorials/partner-nodes/overview.md): In this article, we will introduce ComfyUI's Partner Nodes and related information.
+- [Pricing](https://docs.comfy.org/tutorials/partner-nodes/pricing.md): This article lists the pricing of the current Partner Nodes.
+- [Recraft Text to Image API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/recraft/recraft-text-to-image.md): Learn how to use the Recraft Text to Image Partner node in ComfyUI
+- [Recraft V4 Image & Vector Generation in ComfyUI](https://docs.comfy.org/tutorials/partner-nodes/recraft/recraft-v4.md): Generate professional images and production-ready vectors with Recraft V4 in ComfyUI
+- [Rodin API Node Model Generation ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/rodin/model-generation.md): This article will introduce how to use Rodin node's API in ComfyUI for model generation
+- [Runway API Node Image Generation ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/runway/image-generation.md): This article will introduce how to use Runway nodes in ComfyUI for text-to-image and reference-to-image generation
+- [Runway API Node Video Generation ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/runway/video-generation.md): This article will introduce how to use Runway nodes in ComfyUI for video generation workflows
+- [Stability AI Stable Audio 2.5 API Node ComfyUI Official workflow example](https://docs.comfy.org/tutorials/partner-nodes/stability-ai/stable-audio.md): This article will introduce how to use Stability AI Stable Audio 2.5 Partner node's text-to-audio, audio-to-audio and audio-inpainting capabilities in ComfyUI
+- [Stability AI Stable Diffusion 3.5 API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/stability-ai/stable-diffusion-3-5-image.md): This article will introduce how to use Stability AI Stable Diffusion 3.5 Partner node's text-to-image and image-to-image capabilities in ComfyUI
+- [Stability AI Stable Image Ultra API Node ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/stability-ai/stable-image-ultra.md): This article will introduce how to use the Stability AI Stable Image Ultra Partner node's text-to-image and image-to-image capabilities in ComfyUI
+- [Tripo API Node Model Generation ComfyUI Official Example](https://docs.comfy.org/tutorials/partner-nodes/tripo/model-generation.md): This article will introduce how to use Tripo node's API in ComfyUI for model generation
+- [ComfyUI frame interpolation workflow](https://docs.comfy.org/tutorials/utility/frame-interpolation.md): Learn how to use frame interpolation to smooth motion and increase frame rate in ComfyUI video workflows
+- [Image upscaling in ComfyUI](https://docs.comfy.org/tutorials/utility/image-upscale.md): Learn how to upscale images in ComfyUI using local models and partner nodes for different use cases
+- [ComfyUI preprocessor workflows](https://docs.comfy.org/tutorials/utility/preprocessors.md): Learn how to use depth estimation, lineart conversion, pose detection, and normals extraction preprocessors in ComfyUI
+- [Video upscaling in ComfyUI](https://docs.comfy.org/tutorials/utility/video-upscale.md): Learn how to upscale videos in ComfyUI using local models and partner nodes for different use cases
+- [Cosmos Predict2 Video2World  ComfyUI Official Example](https://docs.comfy.org/tutorials/video/cosmos/cosmos-predict2-video2world.md): This guide demonstrates how to complete Cosmos-Predict2 Video2World workflows in ComfyUI
+- [ComfyUI Hunyuan Video Examples](https://docs.comfy.org/tutorials/video/hunyuan/hunyuan-video.md): This guide shows how to use Hunyuan Text-to-Video and Image-to-Video workflows in ComfyUI
+- [HunyuanVideo 1.5](https://docs.comfy.org/tutorials/video/hunyuan/hunyuan-video-1-5.md): Learn how to use HunyuanVideo 1.5, a lightweight 8.3B parameter model for high-quality video generation on consumer GPUs
+- [Kandinsky 5.0](https://docs.comfy.org/tutorials/video/kandinsky/kandinsky-5.md): This guide shows how to use Kandinsky 5.0 video generation workflows in ComfyUI
+- [LTX-2](https://docs.comfy.org/tutorials/video/ltx/ltx-2.md): A DiT-based audio-video foundation model for synchronized video and audio generation
+- [LTX-Video](https://docs.comfy.org/tutorials/video/ltxv.md)
+- [ComfyUI Wan2.1 Fun Camera Official Examples](https://docs.comfy.org/tutorials/video/wan/fun-camera.md): This guide demonstrates how to use Wan2.1 Fun Camera in ComfyUI for video generation
+- [ComfyUI Wan2.1 Fun Control Video Examples](https://docs.comfy.org/tutorials/video/wan/fun-control.md): This guide demonstrates how to use Wan2.1 Fun Control in ComfyUI to generate videos with control videos
+- [ComfyUI Wan2.1 Fun InP Video Examples](https://docs.comfy.org/tutorials/video/wan/fun-inp.md): This guide demonstrates how to use Wan2.1 Fun InP in ComfyUI to generate videos with first and last frame control
+- [ComfyUI Wan2.1 VACE Video Examples](https://docs.comfy.org/tutorials/video/wan/vace.md): This article introduces how to complete Wan VACE video generation examples in ComfyUI
+- [Wan-Alpha Tutorial](https://docs.comfy.org/tutorials/video/wan/wan-alpha.md): Learn how to generate videos with alpha channel transparency using Wan-Alpha in ComfyUI
+- [Wan ATI ComfyUI Native Workflow Tutorial](https://docs.comfy.org/tutorials/video/wan/wan-ati.md): Using trajectory control for video generation.
+- [ComfyUI Wan2.1 FLF2V Native Example](https://docs.comfy.org/tutorials/video/wan/wan-flf.md): This guide explains how to complete Wan2.1 FLF2V video generation examples in ComfyUI
+- [ComfyUI Wan-Move Workflow Example](https://docs.comfy.org/tutorials/video/wan/wan-move.md): Wan-Move is a motion-controllable video generation model via latent trajectory guidance, enabling fine-grained point-level motion control for image-to-video generation.
+- [ComfyUI Wan2.1 Video Examples](https://docs.comfy.org/tutorials/video/wan/wan-video.md): This guide demonstrates how to generate videos with first and last frames using Wan2.1 Video in ComfyUI
+- [Wan2.2 Animate ComfyUI native workflow](https://docs.comfy.org/tutorials/video/wan/wan2-2-animate.md): Unified character animation and replacement framework with precise motion and expression replication.
+- [ComfyUI Wan2.2 Fun Camera Control: Video Generation Workflow Example](https://docs.comfy.org/tutorials/video/wan/wan2-2-fun-camera.md): This article demonstrates how to use camera control for video generation with Wan2.2 Fun Camera Control in ComfyUI.
+- [ComfyUI Wan2.2 Fun Control Video Generation Example](https://docs.comfy.org/tutorials/video/wan/wan2-2-fun-control.md): This article introduces how to use ComfyUI to complete the Wan2.2 Fun Control video generation using control videos
+- [ComfyUI Wan2.2 Fun Inp Start-End Frame Video Generation Example](https://docs.comfy.org/tutorials/video/wan/wan2-2-fun-inp.md): This article introduces how to use ComfyUI to complete the Wan2.2 Fun Inp start-end frame video generation example
+- [Wan2.2-S2V Audio-Driven Video Generation ComfyUI Native Workflow Example](https://docs.comfy.org/tutorials/video/wan/wan2-2-s2v.md): This is a native workflow example for Wan2.2-S2V audio-driven video generation in ComfyUI.
+- [Wan2.2 Video Generation ComfyUI Official Native Workflow Example](https://docs.comfy.org/tutorials/video/wan/wan2_2.md): Official usage guide for Alibaba Cloud Tongyi Wanxiang 2.2 video generation model in ComfyUI
+
+## OpenAPI Specs
+
+- [openapi](https://docs.comfy.org/openapi.yml)
+- [openapi-cloud](https://docs.comfy.org/openapi-cloud.yaml)

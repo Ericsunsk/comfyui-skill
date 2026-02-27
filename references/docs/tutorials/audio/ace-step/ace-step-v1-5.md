@@ -1,0 +1,155 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.comfy.org/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# ComfyUI ACE-Step 1.5 Music Generation Guide
+
+> Learn how to use ACE-Step 1.5 for AI music generation in ComfyUI. Complete guide with workflows, model downloads, and setup instructions for ComfyUI.
+
+## About ACE-Step 1.5 in ComfyUI
+
+ACE-Step 1.5 is a major update to the open-source music generation model, now natively supported in ComfyUI. It brings commercial-grade quality to your local machine with a novel hybrid architecture where a Language Model acts as an omni-capable planner, transforming simple user queries into comprehensive song blueprints.
+
+**ACE-Step 1.5 Model highlights:**
+
+* **Commercial-grade quality**: Achieves quality beyond most commercial music models, scoring 4.72 on musical coherence
+* **Blazing fast generation**: Generate a full 4-minute song in \~1 second on RTX 5090, or under 10 seconds on RTX 3090 with ComfyUI
+* **50+ language support**: Strong support for English, Chinese, Japanese, Korean, Spanish, German, French, Portuguese, Italian, and Russian
+* **LoRA fine-tuning**: Supports lightweight personalization through LoRA training in ComfyUI
+
+<Tip>
+  <Tabs>
+    <Tab title="Portable or self deployed users">
+      Make sure your ComfyUI is updated.
+
+      * [Download ComfyUI](https://www.comfy.org/download)
+      * [Update Guide](/installation/update_comfyui)
+
+      Workflows in this guide can be found in the [Workflow Templates](/interface/features/template).
+      If you can't find them in the template, your ComfyUI may be outdated. (Desktop version's update will delay sometime)
+
+      If nodes are missing when loading a workflow, possible reasons:
+
+      1. You are not using the latest ComfyUI version (Nightly version)
+      2. Some nodes failed to import at startup
+    </Tab>
+
+    <Tab title="Desktop or Cloud users">
+      * The Desktop is base on ComfyUI stable release, it will auto-update when there is a new Desktop stable release available.
+      * [Cloud](https://cloud.comfy.org) will update after ComfyUI stable release.
+
+      So, if you find any core node missing in this document, it might be because the new core nodes have not yet been released in the latest stable version. Please wait for the next stable release.
+    </Tab>
+  </Tabs>
+</Tip>
+
+## Option 1: All-in-One Checkpoint (Recommended)
+
+The AIO version packages all models into a single checkpoint file, making it easier to download and manage.
+
+### AIO Workflow
+
+<CardGroup cols={2}>
+  <Card title="Run on Comfy Cloud" icon="cloud" href="https://cloud.comfy.org/?template=audio_ace_step_1_5_checkpoint&utm_source=docs">
+    Run the AIO workflow directly on Comfy Cloud.
+  </Card>
+
+  <Card title="Download Workflow" icon="download" href="https://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/audio_ace_step_1_5_checkpoint.json">
+    Download the all-in-one checkpoint workflow for local use.
+  </Card>
+</CardGroup>
+
+### AIO Model Download
+
+<CardGroup cols={1}>
+  <Card title="ace_step_1.5_turbo_aio.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/checkpoints/ace_step_1.5_turbo_aio.safetensors">
+    All-in-one checkpoint file (recommended for most users).
+  </Card>
+</CardGroup>
+
+**AIO Model Storage Location**
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   └── 📂 checkpoints/
+│       └── ace_step_1.5_turbo_aio.safetensors
+```
+
+## Option 2: Split Model Files
+
+The split version allows you to download individual model components separately.
+
+### Split Workflow
+
+<CardGroup cols={2}>
+  <Card title="Run on Comfy Cloud" icon="cloud" href="https://cloud.comfy.org/?template=audio_ace_step_1_5_split&utm_source=docs">
+    Run the split models workflow directly on Comfy Cloud.
+  </Card>
+
+  <Card title="Download Workflow" icon="download" href="https://raw.githubusercontent.com/Comfy-Org/workflow_templates/refs/heads/main/templates/audio_ace_step_1_5_split.json">
+    Download the split models workflow for local use.
+  </Card>
+</CardGroup>
+
+### Split Model Downloads
+
+<CardGroup cols={2}>
+  <Card title="acestep_v1.5_turbo.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/split_files/diffusion_models/acestep_v1.5_turbo.safetensors">
+    Diffusion model.
+  </Card>
+
+  <Card title="qwen_0.6b_ace15.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/split_files/text_encoders/qwen_0.6b_ace15.safetensors">
+    Text encoder (0.6B).
+  </Card>
+
+  <Card title="qwen_1.7b_ace15.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/split_files/text_encoders/qwen_1.7b_ace15.safetensors">
+    Text encoder (1.7B).
+  </Card>
+
+  <Card title="ace_1.5_vae.safetensors" icon="download" href="https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files/resolve/main/split_files/vae/ace_1.5_vae.safetensors">
+    VAE model.
+  </Card>
+</CardGroup>
+
+**Split Models Storage Location**
+
+```
+📂 ComfyUI/
+├── 📂 models/
+│   ├── 📂 diffusion_models/
+│   │   └── acestep_v1.5_turbo.safetensors
+│   ├── 📂 text_encoders/
+│   │   ├── qwen_0.6b_ace15.safetensors
+│   │   └── qwen_1.7b_ace15.safetensors
+│   └── 📂 vae/
+│       └── ace_1.5_vae.safetensors
+```
+
+## ACE-Step 1.5 Key Features in ComfyUI
+
+### Chain-of-Thought Planning
+
+The ACE-Step 1.5 model synthesizes metadata, lyrics, and captions via Chain-of-Thought reasoning to guide the diffusion process, resulting in more coherent long-form compositions.
+
+### Hybrid LM + DiT Architecture
+
+ACE-Step 1.5 combines a Language Model that plans the song structure with a Diffusion Transformer (DiT) that handles audio synthesis, all running natively in ComfyUI.
+
+### LoRA Fine-Tuning in ComfyUI
+
+With just a few songs, you can train a LoRA that captures a specific style. Because you run ACE-Step 1.5 locally in ComfyUI, you own the LoRA and don't have to worry about data leakage.
+
+## Coming Soon to ComfyUI
+
+These features are available in ACE-Step 1.5 but not yet supported in ComfyUI:
+
+* **Cover**: Give the model any song as input along with a new prompt and lyrics, and it will reimagine the track in a completely different style
+* **Repaint**: Select a segment, regenerate just that section, and the model stitches it back in while keeping everything else untouched
+
+## ACE-Step 1.5 ComfyUI Related Resources
+
+* [Project Page](https://ace-step.github.io/)
+* [Hugging Face](https://huggingface.co/Comfy-Org/ace_step_1.5_ComfyUI_files)
+* [GitHub](https://github.com/ace-step/ACE-Step)
+* [Blog Post](https://blog.comfy.org/p/ace-step-15-is-now-available-in-comfyui)

@@ -1,0 +1,29 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.comfy.org/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# ClipTextEncodeSdxl - ComfyUI Built-in Node Documentation
+
+> The ClipTextEncodeSdxl node is used to encode text prompts into SDXL-compatible conditioning embeddings.
+
+This node is designed to encode text input using a CLIP model specifically customized for the SDXL architecture. It uses a dual encoder system (CLIP-L and CLIP-G) to process text descriptions, resulting in more accurate image generation.
+
+## Inputs
+
+| Parameter       | Data Type | Description                                            |
+| --------------- | --------- | ------------------------------------------------------ |
+| `clip`          | CLIP      | CLIP model instance used for text encoding.            |
+| `width`         | INT       | Specifies the image width in pixels, default 1024.     |
+| `height`        | INT       | Specifies the image height in pixels, default 1024.    |
+| `crop_w`        | INT       | Width of the crop area in pixels, default 0.           |
+| `crop_h`        | INT       | Height of the crop area in pixels, default 0.          |
+| `target_width`  | INT       | Target width for the output image, default 1024.       |
+| `target_height` | INT       | Target height for the output image, default 1024.      |
+| `text_g`        | STRING    | Global text description for overall scene description. |
+| `text_l`        | STRING    | Local text description for detail description.         |
+
+## Outputs
+
+| Parameter      | Data Type    | Description                                                                    |
+| -------------- | ------------ | ------------------------------------------------------------------------------ |
+| `CONDITIONING` | CONDITIONING | Contains encoded text and conditional information needed for image generation. |

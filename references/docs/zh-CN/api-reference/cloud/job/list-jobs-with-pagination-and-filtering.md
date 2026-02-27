@@ -1,0 +1,365 @@
+> ## Documentation Index
+> Fetch the complete documentation index at: https://docs.comfy.org/llms.txt
+> Use this file to discover all available pages before exploring further.
+
+# List jobs with pagination and filtering
+
+> Retrieve a paginated list of jobs for the authenticated user.
+Returns lightweight job data optimized for list views.
+Workflow and full outputs are excluded to reduce payload size.
+
+
+
+
+## OpenAPI
+
+````yaml openapi-cloud.yaml get /api/jobs
+openapi: 3.0.3
+info:
+  title: Comfy Cloud API
+  description: >
+    <Warning>
+
+    **Experimental API:** This API is experimental and subject to change. 
+
+    Endpoints, request/response formats, and behavior may be modified without
+    notice.
+
+    </Warning>
+
+
+    API for Comfy Cloud - Run ComfyUI workflows on cloud infrastructure.
+
+
+    This API allows you to interact with Comfy Cloud programmatically,
+    including:
+
+    - Submitting and managing workflows
+
+    - Uploading and downloading files
+
+    - Monitoring job status and progress
+
+
+    ## Cloud vs OSS ComfyUI Compatibility
+
+
+    Comfy Cloud implements the same API interfaces as OSS ComfyUI for maximum
+    compatibility,
+
+    but some fields are accepted for compatibility while being handled
+    differently or ignored:
+
+
+    | Field | Endpoints | Cloud Behavior |
+
+    |-------|-----------|----------------|
+
+    | `subfolder` | `/api/view`, `/api/upload/*` | **Ignored** - Cloud uses
+    content-addressed storage (hash-based). Returned in responses for
+    client-side organization. |
+
+    | `type` (input/output/temp) | `/api/view`, `/api/upload/*` | Partially used
+    - All files stored with tag-based organization rather than directory
+    structure. |
+
+    | `overwrite` | `/api/upload/*` | **Ignored** - Content-addressed storage
+    means identical content always has the same hash. |
+
+    | `number`, `front` | `/api/prompt` | **Ignored** - Cloud uses its own fair
+    queue scheduling per user. |
+
+    | `split`, `full_info` | `/api/userdata` | **Ignored** - Cloud always
+    returns full file metadata. |
+
+
+    These fields are retained in the API schema for drop-in compatibility with
+    existing ComfyUI clients and workflows.
+  version: 1.0.0
+  license:
+    name: GNU General Public License v3.0
+    url: https://github.com/comfyanonymous/ComfyUI/blob/master/LICENSE
+servers:
+  - url: https://cloud.comfy.org
+    description: Comfy Cloud API
+security:
+  - ApiKeyAuth: []
+tags:
+  - name: workflow
+    description: |
+      Submit workflows for execution and manage the execution queue.
+      This is the primary way to run ComfyUI workflows on the cloud.
+  - name: job
+    description: |
+      Monitor job status, view execution history, and manage running jobs.
+      Jobs are created when you submit a workflow via POST /api/prompt.
+  - name: asset
+    description: |
+      Upload, download, and manage persistent assets (images, models, outputs).
+      Assets provide durable storage with tagging and metadata support.
+  - name: file
+    description: |
+      Legacy file upload and download endpoints compatible with local ComfyUI.
+      For new integrations, consider using the Assets API instead.
+  - name: model
+    description: |
+      Browse available AI models. Models are pre-loaded on cloud infrastructure.
+  - name: node
+    description: |
+      Get information about available ComfyUI nodes and their inputs/outputs.
+      Useful for building dynamic workflow interfaces.
+  - name: user
+    description: |
+      User account information and personal data storage.
+  - name: system
+    description: |
+      Server status, health checks, and system information.
+paths:
+  /api/jobs:
+    get:
+      tags:
+        - job
+      summary: List jobs with pagination and filtering
+      description: |
+        Retrieve a paginated list of jobs for the authenticated user.
+        Returns lightweight job data optimized for list views.
+        Workflow and full outputs are excluded to reduce payload size.
+      operationId: listJobs
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: >-
+            Filter by one or more statuses (comma-separated). If not provided,
+            returns all jobs.
+          schema:
+            type: string
+          example: pending,in_progress
+        - name: workflow_id
+          in: query
+          required: false
+          description: Filter by workflow ID (exact match)
+          schema:
+            type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+        - name: output_type
+          in: query
+          required: false
+          description: >-
+            Filter by output media type (only applies to completed jobs with
+            outputs)
+          schema:
+            type: string
+            enum:
+              - image
+              - video
+              - audio
+          example: image
+        - name: sort_by
+          in: query
+          required: false
+          description: >-
+            Field to sort by (create_time = when job was submitted,
+            execution_time = how long workflow took to run)
+          schema:
+            type: string
+            enum:
+              - create_time
+              - execution_time
+            default: create_time
+          example: execution_time
+        - name: sort_order
+          in: query
+          required: false
+          description: Sort direction (asc = ascending, desc = descending)
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+        - name: offset
+          in: query
+          required: false
+          description: Pagination offset (0-based)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - name: limit
+          in: query
+          required: false
+          description: Maximum items per page (1-1000)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 100
+      responses:
+        '200':
+          description: Success - Jobs retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobsListResponse'
+        '401':
+          description: Unauthorized - Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    JobsListResponse:
+      type: object
+      required:
+        - jobs
+        - pagination
+      properties:
+        jobs:
+          type: array
+          description: Array of jobs ordered by specified sort field
+          items:
+            $ref: '#/components/schemas/JobEntry'
+        pagination:
+          $ref: '#/components/schemas/PaginationInfo'
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+    JobEntry:
+      type: object
+      description: Lightweight job data for list views (workflow and full outputs excluded)
+      required:
+        - id
+        - status
+        - create_time
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique job identifier
+        status:
+          type: string
+          enum:
+            - pending
+            - in_progress
+            - completed
+            - failed
+            - cancelled
+          description: User-friendly job status
+        execution_error:
+          $ref: '#/components/schemas/ExecutionError'
+          description: >-
+            Detailed execution error from ComfyUI (only for failed jobs with
+            structured error data)
+        create_time:
+          type: integer
+          format: int64
+          description: Job creation timestamp (Unix timestamp in seconds)
+        preview_output:
+          type: object
+          description: Primary preview output (only present for terminal states)
+          additionalProperties: true
+        outputs_count:
+          type: integer
+          description: Total number of output files (omitted for non-terminal states)
+        workflow_id:
+          type: string
+          description: UUID identifying the workflow graph definition
+        execution_start_time:
+          type: integer
+          format: int64
+          description: >-
+            Workflow execution start timestamp (Unix milliseconds, only present
+            for terminal states)
+        execution_end_time:
+          type: integer
+          format: int64
+          description: >-
+            Workflow execution completion timestamp (Unix milliseconds, only
+            present for terminal states)
+    PaginationInfo:
+      type: object
+      required:
+        - offset
+        - limit
+        - total
+        - has_more
+      properties:
+        offset:
+          type: integer
+          minimum: 0
+          description: Current offset (0-based)
+        limit:
+          type: integer
+          minimum: 1
+          description: Items per page
+        total:
+          type: integer
+          minimum: 0
+          description: Total number of items matching filters
+        has_more:
+          type: boolean
+          description: Whether more items are available beyond this page
+    ExecutionError:
+      type: object
+      description: Detailed execution error information from ComfyUI
+      required:
+        - node_id
+        - node_type
+        - exception_message
+        - exception_type
+        - traceback
+        - current_inputs
+        - current_outputs
+      properties:
+        node_id:
+          type: string
+          description: ID of the node that failed
+        node_type:
+          type: string
+          description: Type name of the node (e.g., "KSampler")
+        exception_message:
+          type: string
+          description: Human-readable error message
+        exception_type:
+          type: string
+          description: Python exception type (e.g., "RuntimeError")
+        traceback:
+          type: array
+          items:
+            type: string
+          description: Array of traceback lines (empty array if not available)
+        current_inputs:
+          type: object
+          additionalProperties: true
+          description: Input values at time of failure (empty object if not available)
+        current_outputs:
+          type: object
+          additionalProperties: true
+          description: Output values at time of failure (empty object if not available)
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: >
+        API key authentication. Generate an API key from your account settings
+
+        at https://platform.comfy.org/profile/api-keys. Pass the key in the
+        X-API-Key header.
+
+````

@@ -1,0 +1,4 @@
+interface:
+  display_name: "ComfyUI Docs Expert"
+  short_description: "Full-coverage ComfyUI official docs skill"
+  default_prompt: "Use $comfyui-official-docs to answer ComfyUI tasks using docs.comfy.org and cite exact pages."

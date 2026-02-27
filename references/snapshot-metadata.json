@@ -1,0 +1,26 @@
+{
+  "allow_partial": false,
+  "base_url": "https://docs.comfy.org",
+  "coverage_complete": true,
+  "errors": [],
+  "generated_at": "2026-02-27T07:26:24.342896+00:00",
+  "incremental": true,
+  "partial_reasons": [],
+  "sources": {
+    "llms_full": "https://docs.comfy.org/llms-full.txt",
+    "llms_index": "https://docs.comfy.org/llms.txt",
+    "sitemap_xml": "https://docs.comfy.org/sitemap.xml"
+  },
+  "totals": {
+    "cached": 695,
+    "downloaded": 0,
+    "entries": 695,
+    "errors": 0,
+    "limit": 0,
+    "ok": 695,
+    "retries": 3,
+    "skipped": 0,
+    "timeout_seconds": 30,
+    "workers": 16
+  }
+}
