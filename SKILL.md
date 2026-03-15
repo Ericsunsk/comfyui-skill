@@ -1,78 +1,109 @@
 ---
 name: comfyui-official-docs
-description: "Full-coverage ComfyUI official documentation skill using docs.comfy.org as the source of truth. Use when answering or implementing ComfyUI tasks that require official references: installation, interface behavior, workflow JSON, custom node development, registry publishing, Comfy Cloud usage, API endpoint details, request/response schemas, or troubleshooting. Use when users ask for latest official behavior, exact endpoint names, or citation-backed guidance."
+description: "Official ComfyUI documentation skill backed by a local full snapshot of docs.comfy.org. Use when planning, building, debugging, or implementing ComfyUI workflows, workflow JSON, built-in node usage, self-hosted server integrations, Comfy Cloud API calls, custom node installation/development, registry publishing, manager behavior, or official troubleshooting. Use when the task needs exact node names, schema fields, endpoint paths, request/response details, or citation-backed latest official behavior."
 ---
 
 # ComfyUI Official Docs
 
-Use this skill to answer ComfyUI questions with official docs only, backed by a local full snapshot.
+Use this skill when ComfyUI work should follow official docs, not community memory.
+
+## What This Skill Covers
+
+- Designing or fixing ComfyUI workflows with official nodes and templates.
+- Editing or generating workflow JSON that must match the official schema.
+- Implementing self-hosted ComfyUI server integrations.
+- Implementing Comfy Cloud API integrations.
+- Installing, debugging, developing, or publishing custom nodes with official guidance.
+- Answering behavior-critical ComfyUI questions with exact citations.
+
+## Source Of Truth
+
+1. `references/docs/` is the local mirror of `docs.comfy.org`.
+2. `references/docs-manifest.tsv` maps local files to exact official URLs.
+3. `references/snapshot-metadata.json` records snapshot freshness and completeness.
+4. `references/task-routing.md` is the fast path for common task families.
 
 ## Quick Start
 
-1. Refresh the snapshot:
-   `python3 scripts/sync_official_docs.py --clean`
-2. Fast refresh with incremental cache reuse:
-   `python3 scripts/sync_official_docs.py`
-3. Audit full-coverage integrity:
+1. Search the current snapshot by task first, not by a single broad query:
+   - Workflow / JSON: `python3 scripts/search_official_docs.py "your query" --task workflow --top 10`
+   - Built-in nodes: `python3 scripts/search_official_docs.py "KSampler" --task node --section built-in-nodes --top 5`
+   - Self-hosted server: `python3 scripts/search_official_docs.py "queue prompt websocket routes" --task server --top 8`
+   - Cloud API: `python3 scripts/search_official_docs.py "submit workflow execution" --task cloud --top 8`
+   - Custom nodes: `python3 scripts/search_official_docs.py "missing custom node" --task custom-node --top 8`
+   - Registry: `python3 scripts/search_official_docs.py "publish node version" --task registry --top 8`
+2. Open the matched markdown files under `references/docs/`.
+3. Cite the exact official URLs from `references/docs-manifest.tsv`.
+4. Refresh the snapshot only when freshness matters or the snapshot is missing:
+   - Full refresh: `python3 scripts/sync_official_docs.py --clean`
+   - Incremental refresh: `python3 scripts/sync_official_docs.py`
+5. Audit completeness when you refreshed or when coverage is uncertain:
    `python3 scripts/audit_snapshot.py`
-4. Search relevant pages:
-   `python3 scripts/search_official_docs.py "your query" --top 15`
-5. Read matched files under `references/docs/`.
-6. Cite exact official URLs from `references/docs-manifest.tsv`.
 
-## Workflow
+## Task Routing
 
-1. Determine whether freshness matters.
-   For "latest", "new", "recent", API behavior, or cloud features, run sync first.
-2. Locate candidate pages.
-   Use `scripts/search_official_docs.py` for keyword retrieval.
-   Use `--lang en` or `--lang zh` when you want language-specific matches.
-   Use `--section api-reference` (or other top-level section) to narrow scope.
-   Default behavior suppresses lowercase `zh-cn` alias duplicates when identical to canonical pages.
-3. Validate against source records.
-   Confirm URL mapping in `references/docs-manifest.tsv` and last sync status in `references/snapshot-metadata.json`.
-4. Answer with citations.
-   Provide the final answer with official docs URLs and keep wording consistent with docs.
+1. Workflow design or debugging:
+   Start with `--task workflow`.
+   Use a tutorial or `development/core-concepts/workflow.md` to establish structure.
+   Validate exact node names and inputs against the matching `built-in-nodes/*.md` files.
+   If you emit or edit JSON, validate against `specs/workflow_json.md`.
+2. Built-in node lookup:
+   Search the exact node name with `--task node --section built-in-nodes`.
+   Prefer the exact node page over tutorial snippets.
+3. Self-hosted server automation:
+   Use `--task server`.
+   Stay inside `development/comfyui-server/*` unless the user explicitly asks about Cloud.
+4. Comfy Cloud:
+   Use `--task cloud`.
+   Open the exact `api-reference/cloud/...` page before citing payloads or responses.
+5. Custom nodes and registry:
+   Use `--task custom-node` for installation, missing-node, migration, or authoring issues.
+   Use `--task registry` for publishing, versions, PATs, publishers, or install-resolution APIs.
+6. Installation and troubleshooting:
+   Use `--task install` or `--task troubleshoot`.
+   Prefer `installation/*`, `manager/*`, and `troubleshooting/*` over generic search.
 
-## Coverage Contract
+## Retrieval Rules
 
-Treat full coverage as satisfied only when:
+1. Reuse exact strings from the user whenever possible:
+   node names, route names, schema fields, error text, workflow feature names.
+2. For exact lookups or noisy search results, use:
+   `rg -n "your exact token" references/docs references/llms-full.txt`
+3. Search results are only the routing layer.
+   Always open the matched page before answering schema, API, or behavior questions.
+4. Distinguish citation-backed facts from your inference.
+5. If official docs do not confirm a field, route, node behavior, or third-party custom-node detail, say so directly.
+6. Treat model file names, local paths, checkpoint availability, and third-party node behavior as environment-specific unless the docs explicitly define them.
 
-1. `references/sitemap.xml` is present.
-2. `references/docs-manifest.tsv` exists for all sitemap entries.
-3. `references/snapshot-metadata.json` reports `coverage_complete = true`.
-4. `references/docs/` contains markdown pages mapped by manifest paths.
-5. `python3 scripts/audit_snapshot.py` returns exit code `0`.
+## Freshness And Coverage
 
-If coverage is incomplete, rerun:
-
-`python3 scripts/sync_official_docs.py --clean --workers 8 --retries 5`
-
-For intentionally partial snapshots (debug/sampling only), opt in explicitly:
-
-`python3 scripts/sync_official_docs.py --limit 20 --allow-partial`
-
-To force full re-download and bypass cache:
-
-`python3 scripts/sync_official_docs.py --clean --no-incremental`
-
-Sync writes through a staging directory and atomically swaps on success.
-Use `--no-atomic` only for debugging.
+1. For "latest", "new", "recent", "current", API behavior changes, or Cloud features, sync first.
+2. Mention the snapshot date from `references/snapshot-metadata.json` when answering time-sensitive questions.
+3. Treat coverage as complete only when:
+   - `references/sitemap.xml` exists.
+   - `references/docs-manifest.tsv` exists.
+   - `references/snapshot-metadata.json` reports `coverage_complete = true`.
+   - `python3 scripts/audit_snapshot.py` exits `0`.
+4. If coverage is incomplete, rerun:
+   `python3 scripts/sync_official_docs.py --clean --workers 8 --retries 5`
+5. If network refresh is not possible, answer from the current snapshot and state the snapshot date explicitly.
 
 ## Reference Files
 
+- `references/task-routing.md`: task-to-doc-family routing for common ComfyUI jobs.
 - `references/sitemap.xml`: official page inventory.
 - `references/llms.txt`: official docs index links.
-- `references/llms-full.txt`: single-file consolidated docs text.
+- `references/llms-full.txt`: consolidated docs text for exact-string lookup fallback.
 - `references/docs/`: per-page markdown mirror from official `.md` endpoints.
-- `references/docs-manifest.tsv`: URL to local-file mapping and sync status.
-- `references/snapshot-metadata.json`: sync metadata and error summary.
-- `references/coverage.md`: section counts and failed page list (if any).
+- `references/docs-manifest.tsv`: URL mapping and sync status.
+- `references/snapshot-metadata.json`: sync metadata and last snapshot time.
+- `references/coverage.md`: section counts and failed page list.
 - `scripts/audit_snapshot.py`: strict completeness and integrity audit.
 
 ## Operating Rules
 
 1. Prefer official docs.comfy.org content over memory.
 2. Do not mix unofficial community guidance unless explicitly requested.
-3. Report exact page URLs for endpoint-level or behavior-critical claims.
-4. Mention snapshot date when answering "latest" questions.
+3. Keep local server guidance and Cloud guidance separate.
+4. Report exact page URLs for endpoint-level, schema-level, and behavior-critical claims.
+5. Mention the snapshot date when answering "latest" questions.

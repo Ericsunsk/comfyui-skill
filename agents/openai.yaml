@@ -1,4 +1,4 @@
 interface:
-  display_name: "ComfyUI Docs Expert"
-  short_description: "Full-coverage ComfyUI official docs skill"
-  default_prompt: "Use $comfyui-official-docs to answer ComfyUI tasks using docs.comfy.org and cite exact pages."
+  display_name: "ComfyUI Official Docs Operator"
+  short_description: "Official ComfyUI workflow and API docs"
+  default_prompt: "Use $comfyui-official-docs to design, debug, or implement ComfyUI workflows and APIs with exact docs.comfy.org citations."

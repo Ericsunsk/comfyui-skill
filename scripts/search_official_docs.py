@@ -29,6 +29,12 @@ class Match:
     snippet: str
 
 
+@dataclass(frozen=True)
+class TaskPreset:
+    path_prefixes: tuple[str, ...]
+    description: str
+
+
 EN_STOPWORDS = {
     "a",
     "an",
@@ -79,6 +85,77 @@ SHORT_TERM_ALLOWLIST = {
     "v2",
     "v3",
     "zh",
+}
+
+
+TASK_PRESETS = {
+    "workflow": TaskPreset(
+        path_prefixes=(
+            "tutorials/basic/",
+            "tutorials/controlnet/",
+            "tutorials/flux/",
+            "tutorials/utility/",
+            "tutorials/video/",
+            "tutorials/3d/",
+            "built-in-nodes/",
+            "specs/",
+            "development/core-concepts/",
+            "interface/",
+        ),
+        description="Workflow design, built-in nodes, templates, and workflow JSON schema.",
+    ),
+    "node": TaskPreset(
+        path_prefixes=(
+            "built-in-nodes/",
+            "tutorials/basic/",
+            "tutorials/controlnet/",
+            "tutorials/flux/",
+            "tutorials/utility/",
+            "tutorials/video/",
+            "tutorials/3d/",
+            "development/core-concepts/",
+            "custom-nodes/",
+        ),
+        description="Official node lookup and node-level behavior.",
+    ),
+    "server": TaskPreset(
+        path_prefixes=("development/comfyui-server/",),
+        description="Self-hosted ComfyUI server routes, messages, and execution behavior.",
+    ),
+    "cloud": TaskPreset(
+        path_prefixes=(
+            "development/cloud/",
+            "api-reference/cloud/",
+            "cloud/",
+            "account/",
+        ),
+        description="Comfy Cloud APIs, auth, jobs, files, workflows, and assets.",
+    ),
+    "custom-node": TaskPreset(
+        path_prefixes=(
+            "custom-nodes/",
+            "manager/",
+            "installation/install_custom_node.md",
+            "troubleshooting/custom-node-issues.md",
+            "registry/",
+            "development/core-concepts/custom-nodes.md",
+            "development/core-concepts/nodes.md",
+            "development/core-concepts/properties.md",
+        ),
+        description="Custom node install, debugging, authoring, and migration guidance.",
+    ),
+    "registry": TaskPreset(
+        path_prefixes=("registry/", "api-reference/registry/"),
+        description="Registry publishing flow, node metadata, versions, and publisher APIs.",
+    ),
+    "install": TaskPreset(
+        path_prefixes=("installation/", "manager/", "troubleshooting/", "support/"),
+        description="Installation, updates, manager usage, and operational fixes.",
+    ),
+    "troubleshoot": TaskPreset(
+        path_prefixes=("troubleshooting/", "installation/", "manager/", "support/"),
+        description="Troubleshooting, break-fix, and recovery guidance.",
+    ),
 }
 
 
@@ -204,6 +281,17 @@ def detect_doc_section(rel_path: str) -> str:
     return rel_path.split("/", 1)[0]
 
 
+def matches_prefix_filter(rel_path: str, path_prefixes: Sequence[str]) -> bool:
+    if not path_prefixes:
+        return True
+    lower_rel = rel_path.lower()
+    for prefix in path_prefixes:
+        normalized = prefix.strip().lower()
+        if normalized and lower_rel.startswith(normalized):
+            return True
+    return False
+
+
 def is_zhcn_alias_duplicate(
     rel_path: str,
     manifest_rows: Dict[str, ManifestRow],
@@ -235,6 +323,7 @@ def search_snapshot(
     context_lines: int,
     lang: Literal["all", "en", "zh"],
     section: str,
+    path_prefixes: Sequence[str],
     dedupe_alias: bool,
 ) -> List[Match]:
     terms = build_query_terms(query)
@@ -246,6 +335,8 @@ def search_snapshot(
     section_filter = section.strip().lower()
     for file_path in files:
         rel = file_path.relative_to(docs_dir).as_posix()
+        if not matches_prefix_filter(rel, path_prefixes):
+            continue
         doc_section = detect_doc_section(rel).lower()
         if section_filter and doc_section != section_filter:
             continue
@@ -342,6 +433,15 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Top-level section filter (example: api-reference, tutorials, zh-CN).",
     )
+    parser.add_argument(
+        "--task",
+        choices=sorted(TASK_PRESETS),
+        default="",
+        help=(
+            "Task preset that narrows search to the most relevant doc families. "
+            "Useful to keep server, cloud, registry, and workflow docs separate."
+        ),
+    )
     parser.set_defaults(dedupe_alias=True)
     parser.add_argument(
         "--no-dedupe-alias",
@@ -363,6 +463,8 @@ def main() -> int:
     references_dir = Path(args.references_dir).resolve()
     docs_dir = references_dir / "docs"
     manifest_path = references_dir / "docs-manifest.tsv"
+    task = args.task.strip().lower()
+    task_preset = TASK_PRESETS.get(task) if task else None
 
     if not docs_dir.exists():
         if args.json_output:
@@ -389,6 +491,7 @@ def main() -> int:
             context_lines=max(args.context_lines, 0),
             lang=args.lang,
             section=args.section,
+            path_prefixes=task_preset.path_prefixes if task_preset is not None else (),
             dedupe_alias=bool(args.dedupe_alias),
         )
     except (FileNotFoundError, ValueError, OSError, UnicodeDecodeError) as exc:
@@ -414,6 +517,7 @@ def main() -> int:
                 "query": args.query,
                 "language": args.lang,
                 "section": args.section,
+                "task": task,
                 "results_count": 0,
                 "results": [],
             }
@@ -428,6 +532,7 @@ def main() -> int:
             "query": args.query,
             "language": args.lang,
             "section": args.section,
+            "task": task,
             "results_count": len(matches),
             "results": [
                 {
@@ -446,6 +551,8 @@ def main() -> int:
 
     print(f'Query: "{args.query}"')
     print(f"Language: {args.lang}")
+    if task_preset is not None:
+        print(f"Task: {task} ({task_preset.description})")
     if args.section:
         print(f"Section: {args.section}")
     print(f"Results: {len(matches)}")
